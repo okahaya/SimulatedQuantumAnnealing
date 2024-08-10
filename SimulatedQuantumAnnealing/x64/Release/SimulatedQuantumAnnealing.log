@@ -1,0 +1,13 @@
+﻿  pch.cpp
+  ctypes_sqa.cpp
+C:\Users\okaha\source\repos\SimulatedQuantumAnnealing\SimulatedQuantumAnnealing\ctypes_sqa.cpp(30,11): warning C4267: '初期化中': 'size_t' から 'int' に変換しました。データが失われているかもしれません。
+C:\Users\okaha\source\repos\SimulatedQuantumAnnealing\SimulatedQuantumAnnealing\ctypes_sqa.cpp(31,11): warning C4267: '初期化中': 'size_t' から 'int' に変換しました。データが失われているかもしれません。
+C:\Users\okaha\source\repos\SimulatedQuantumAnnealing\SimulatedQuantumAnnealing\ctypes_sqa.cpp(46,11): warning C4267: '初期化中': 'size_t' から 'int' に変換しました。データが失われているかもしれません。
+C:\Users\okaha\source\repos\SimulatedQuantumAnnealing\SimulatedQuantumAnnealing\ctypes_sqa.cpp(47,11): warning C4267: '初期化中': 'size_t' から 'int' に変換しました。データが失われているかもしれません。
+C:\Users\okaha\source\repos\SimulatedQuantumAnnealing\SimulatedQuantumAnnealing\ctypes_sqa.cpp(57,44): warning C4244: '引数': 'double' から 'int' への変換です。データが失われる可能性があります。
+  dllmain.cpp
+  コード生成しています。
+  Previous IPDB not found, fall back to full compilation.
+  All 19 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  コード生成が終了しました。
+  SimulatedQuantumAnnealing.vcxproj -> C:\Users\okaha\source\repos\SimulatedQuantumAnnealing\x64\Release\SimulatedQuantumAnnealing.dll
