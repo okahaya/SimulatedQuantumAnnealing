@@ -26,37 +26,31 @@ int randint(int low, int high)
     return dist(gen);
 }
 
-double qubo_energy(const vector<vector<int>>& bits, const vector<vector<double>>& Q) {
-    int L = bits.size();
-    int N = bits[0].size();
+double qubo_energy(const vector<int>& bits, const vector<vector<double>>& Q) {
+    int N = bits.size();
     double energy = 0.0;
 
-    for (int i = 0; i < L; ++i) {
-        for (int j = 0; j < N; ++j) {
-            for (int k = 0; k < N; ++k) {
-                energy += Q[j][k] * bits[i][j] * bits[i][k];
-            }
+    for (int j = 0; j < N; ++j) {
+        for (int k = 0; k < N; ++k) {
+            energy += Q[j][k] * bits[j] * bits[k];
         }
     }
+
 
     return energy;
 }
 
-void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q, double T, double max_dE = 1000.0) {
-    int L = bits.size();
-    int N = bits[0].size();
-    #pragma omp parallel for num_threads(L)
-    for(int layer=0;layer<L;++layer){
-    // int layer = randint(0,L-1);
-    int bit = randint(0,N-1);
-    int current_bit = bits[layer][bit];
-    bits[layer][bit] = 1 - bits[layer][bit];
+void monte_carlo_step(vector<int>& bits, const vector<vector<double>>& Q, double T, double max_dE = 1000.0) {
+    int N = bits.size();
 
-    double dE = (1 - 2 * current_bit) * (inner_product(Q[bit].begin(), Q[bit].end(), bits[layer].begin(), 0.0));
+    int bit = randint(0,N-1);
+    int current_bit = bits[bit];
+    bits[bit] = 1 - bits[bit];
+
+    double dE = (1 - 2 * current_bit) * (inner_product(Q[bit].begin(), Q[bit].end(), bits.begin(), 0.0));
     dE = max(-max_dE, min(dE, max_dE));
     if (static_cast<double>(randint(1,1e8) / 1e8) >= exp(-dE / T)) {
-        bits[layer][bit] = current_bit;
-    }
+        bits[bit] = current_bit;
     }
 }
 
@@ -69,9 +63,13 @@ pair<vector<int>, double> SimulatedQuantumAnnealing::simulated_quantum_annealing
         }
     }
     auto start = chrono::high_resolution_clock::now();
-    for (int i = 0; i < anneal_steps; ++i) {
-        for (int j = 0; j < mc_steps; ++j) {
-            monte_carlo_step(bits, Q, T);
+    #pragma omp parallel for num_threads(L)
+    for(int layer=0;layer<L;++layer){
+        for (int i = 0; i < anneal_steps; ++i){
+            for (int j = 0; j < mc_steps; ++j)
+            {
+                monte_carlo_step(bits[layer], Q, T);
+            }
         }
         T *= 0.9;
         // cout << "T is " << T << endl;
@@ -82,17 +80,15 @@ pair<vector<int>, double> SimulatedQuantumAnnealing::simulated_quantum_annealing
 
     double min_energy = numeric_limits<double>::infinity();
     vector<int> best_bits;
-
+    #pragma omp parallel for num_threads(L)
     for (int layer = 0; layer < L; ++layer) {
-        double layer_energy = qubo_energy({bits[layer]}, Q); 
+        double layer_energy = qubo_energy(bits[layer], Q); 
         if (layer_energy <= min_energy) {
             min_energy = layer_energy;
             best_bits = bits[layer];
-            // for(int bit=0;bit<N;++bit)cout << bits[layer][bit] << " ";
-            // cout <<endl;
         }
     }
 
-    min_energy = qubo_energy({best_bits}, Q);
+    min_energy = qubo_energy(best_bits, Q);
     return {best_bits, min_energy};
 }

@@ -14,10 +14,14 @@ void generate_n_hot_qubo(vector<vector<double>>& Q,int N, int n) {
 
 int main(){
     cout << "start"<<endl;
-    int N = 20; //total bits
+    int N = 32; //total bits
     N = N*N;
+    int L = 10;
+    int mc_steps = 100;
+    int anneal_steps = 1000;
+    double T = 1;
     int num = 10; //num of selected bits
-    SimulatedQuantumAnnealing SQA = SimulatedQuantumAnnealing(N=N);
+    SimulatedQuantumAnnealing SQA = SimulatedQuantumAnnealing(N,L,mc_steps,anneal_steps,T);
     auto Q = SQA.init_jij();
 
     generate_n_hot_qubo(Q,N,num);
