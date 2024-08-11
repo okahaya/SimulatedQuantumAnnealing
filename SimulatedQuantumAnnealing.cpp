@@ -8,6 +8,7 @@
 #include <random>
 #include <chrono>
 #include <numeric>
+#include <omp.h>
 
 using namespace std;
 random_device rd;
@@ -44,7 +45,9 @@ double qubo_energy(const vector<vector<int>>& bits, const vector<vector<double>>
 void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q, double T, double max_dE = 1000.0) {
     int L = bits.size();
     int N = bits[0].size();
-    int layer = randint(0,L-1);
+    #pragma omp parallel for num_threads(L)
+    for(int layer=0;layer<L;++layer){
+    // int layer = randint(0,L-1);
     int bit = randint(0,N-1);
     int current_bit = bits[layer][bit];
     bits[layer][bit] = 1 - bits[layer][bit];
@@ -54,7 +57,7 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
     if (static_cast<double>(randint(1,1e8) / 1e8) >= exp(-dE / T)) {
         bits[layer][bit] = current_bit;
     }
-
+    }
 }
 
 pair<vector<int>, double> SimulatedQuantumAnnealing::simulated_quantum_annealing(vector<vector<double>> Q) 

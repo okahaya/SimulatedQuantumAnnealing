@@ -14,7 +14,7 @@ void generate_n_hot_qubo(vector<vector<double>>& Q,int N, int n) {
 
 int main(){
     cout << "start"<<endl;
-    int N = 10; //total bits
+    int N = 20; //total bits
     N = N*N;
     int num = 10; //num of selected bits
     SimulatedQuantumAnnealing SQA = SimulatedQuantumAnnealing(N=N);
@@ -23,11 +23,7 @@ int main(){
     generate_n_hot_qubo(Q,N,num);
 
     pair<vector<int>, double> result = SQA.simulated_quantum_annealing(Q);
-    cout << "Best bits: ";
-    for (int bit=0;bit<N;++bit) {
-        cout << result.first[bit] << " ";
-    }
-    cout << endl;
+
 
     cout << "Minimum energy: " << result.second + num*num << endl;
 
