@@ -3,10 +3,6 @@
   "WorkspaceRootPath": "C:\\Users\\okaha\\source\\repos\\SimulatedQuantumAnnealing\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{1BDACADD-D8E1-4B5B-9FB7-0474EA6BA767}|SimulatedQuantumAnnealing\\SimulatedQuantumAnnealing.vcxproj|C:\\Users\\okaha\\source\\repos\\SimulatedQuantumAnnealing\\SimulatedQuantumAnnealing\\ctypes_sqa.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
-      "RelativeMoniker": "D:0:0:{1BDACADD-D8E1-4B5B-9FB7-0474EA6BA767}|SimulatedQuantumAnnealing\\SimulatedQuantumAnnealing.vcxproj|solutionrelative:SimulatedQuantumAnnealing\\ctypes_sqa.h||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{1BDACADD-D8E1-4B5B-9FB7-0474EA6BA767}|SimulatedQuantumAnnealing\\SimulatedQuantumAnnealing.vcxproj|C:\\Users\\okaha\\source\\repos\\SimulatedQuantumAnnealing\\SimulatedQuantumAnnealing\\ctypes_sqa.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{1BDACADD-D8E1-4B5B-9FB7-0474EA6BA767}|SimulatedQuantumAnnealing\\SimulatedQuantumAnnealing.vcxproj|solutionrelative:SimulatedQuantumAnnealing\\ctypes_sqa.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
     },
@@ -27,19 +23,6 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "ctypes_sqa.h",
-              "DocumentMoniker": "C:\\Users\\okaha\\source\\repos\\SimulatedQuantumAnnealing\\SimulatedQuantumAnnealing\\ctypes_sqa.h",
-              "RelativeDocumentMoniker": "SimulatedQuantumAnnealing\\ctypes_sqa.h",
-              "ToolTip": "C:\\Users\\okaha\\source\\repos\\SimulatedQuantumAnnealing\\SimulatedQuantumAnnealing\\ctypes_sqa.h",
-              "RelativeToolTip": "SimulatedQuantumAnnealing\\ctypes_sqa.h",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAIAAAAAAAAA",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000680|",
-              "WhenOpened": "2024-08-10T08:25:00.811Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 1,
               "Title": "ctypes_sqa.cpp",
               "DocumentMoniker": "C:\\Users\\okaha\\source\\repos\\SimulatedQuantumAnnealing\\SimulatedQuantumAnnealing\\ctypes_sqa.cpp",
               "RelativeDocumentMoniker": "SimulatedQuantumAnnealing\\ctypes_sqa.cpp",
@@ -52,7 +35,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 1,
               "Title": "dllmain.cpp",
               "DocumentMoniker": "C:\\Users\\okaha\\source\\repos\\SimulatedQuantumAnnealing\\SimulatedQuantumAnnealing\\dllmain.cpp",
               "RelativeDocumentMoniker": "SimulatedQuantumAnnealing\\dllmain.cpp",
@@ -60,8 +43,7 @@
               "RelativeToolTip": "SimulatedQuantumAnnealing\\dllmain.cpp",
               "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
-              "WhenOpened": "2024-08-10T08:24:14.903Z",
-              "EditorCaption": ""
+              "WhenOpened": "2024-08-10T08:24:14.903Z"
             }
           ]
         }
