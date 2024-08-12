@@ -31,7 +31,7 @@ double qubo_energy(const vector<int>& bits, const vector<vector<double>>& Q) {
     int N = bits.size();
     double energy = 0.0;
     for (int j = 0; j < N; ++j) {
-        for (int k = 0; k < N; ++k) {
+        for (int k = j; k < N; ++k) {
             energy += Q[j][k] * bits[j] * bits[k];
         }
     }
