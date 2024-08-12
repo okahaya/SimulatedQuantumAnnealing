@@ -37,25 +37,26 @@ double qubo_energy(const vector<int>& bits, const vector<vector<double>>& Q) {
     }
     return energy;
 }
-double qubo_diff(vector<int>& bits,int bit, const vector<vector<double>>& Q){
-    double diff = 0;
-    int N = bits.size();
-    for(int i=0;i<N;++i){
-        diff += (Q[bit][i]+Q[i][bit])*bits[i];
-    }
-    diff -= Q[bit][bit]*bits[bit];
-    return diff;
-}//怪しい
+// double qubo_diff(vector<int>& bits,int bit, const vector<vector<double>>& Q){
+//     double diff = 0;
+//     int N = bits.size();
+//     for(int i=0;i<N;++i){
+//         diff += (Q[bit][i]+Q[i][bit])*bits[i];
+//     }
+//     diff -= Q[bit][bit]*bits[bit];
+//     return diff;
+// }//怪しい
 
 void monte_carlo_step(vector<int>& bits, const vector<vector<double>>& Q, double T, double max_dE = 1000.0) {
     int N = bits.size();
 
     int bit = randint(0,N-1);
-    double diff = qubo_diff(bits,bit,Q);
+    // double diff = qubo_diff(bits,bit,Q);
     int current_bit = bits[bit];
     bits[bit] = 1 - bits[bit];
 
-    double dE = (1 - 2 * current_bit) * diff;
+    // double dE = (1 - 2 * current_bit) * diff;
+    double dE = (1 - 2* current_bit) * (inner_product(Q[bit].begin(), Q[bit].end(), bits.begin(), 0.0));
     dE = max(-max_dE, min(dE, max_dE));
     if (static_cast<double>(randint(1,1e8) / 1e8) >= exp(-dE / T)) {
         bits[bit] = current_bit;
@@ -78,9 +79,9 @@ pair<vector<int>, double> SimulatedQuantumAnnealing::simulated_quantum_annealing
             {
                 monte_carlo_step(bits[layer], Q, T);
             }
-        }
         T *= 0.9;
-        // cout << "T is " << T << endl;
+        }
+
     }
     auto end = chrono::high_resolution_clock::now();
     auto duration = chrono::duration_cast<chrono::milliseconds>(end - start).count();
