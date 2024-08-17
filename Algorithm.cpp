@@ -23,11 +23,8 @@ void monte_carlo_step(vector<int>& bits, const vector<vector<double>>& Q, double
     int N = bits.size();
 
     int bit = randint(0,N-1);
-    // double diff = qubo_diff(bits,bit,Q);
     int current_bit = bits[bit];
     bits[bit] = 1 - bits[bit];
-
-    // double dE = (1 - 2 * current_bit) * diff;
     double dE = (1 - 2* current_bit) * (inner_product(Q[bit].begin(), Q[bit].end(), bits.begin(), 0.0));
     dE = max(-max_dE, min(dE, max_dE));
     if (static_cast<double>(randint(1,1e8) / 1e8) >= exp(-dE / T)) {
@@ -54,6 +51,40 @@ void execute_annealing(vector<vector<int>>& bits,vector<vector<double>> Q,int L,
         T *= 0.9;
         }
 
+    }
+    auto end = chrono::high_resolution_clock::now();
+    duration = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+}
+
+
+void monte_carlo_step_layer_metropolis(vector<vector<int>>& bits, const vector<vector<double>>& Q, double T, double max_dE = 1000.0) {
+    int N = bits.size();
+    int L = bits[0].size();
+    int bit = randint(0,N-1);
+    int layer = randint(0,L-1);
+    int current_bit = bits[layer][bit];
+    bits[layer][bit] = 1 - bits[layer][bit];
+    double dE = (1 - 2* current_bit) * (inner_product(Q[bit].begin(), Q[bit].end(), bits[layer].begin(), 0.0));
+    dE = max(-max_dE, min(dE, max_dE));
+    if (static_cast<double>(randint(1,1e8) / 1e8) >= exp(-dE / T)) {
+        bits[layer][bit] = current_bit;
+    }
+}
+
+void execute_annealing_layer_metropolis(vector<vector<int>>& bits,vector<vector<double>> Q,int L,int N,int T,int anneal_steps,int mc_steps,double& duration){
+
+    for (int i = 0; i < L; ++i) {
+        for (int j = 0; j < N; ++j) {
+            bits[i][j] = randint(0,1);
+        }
+    }
+    
+    auto start = chrono::high_resolution_clock::now();
+    for (int i = 0; i < anneal_steps; ++i){
+        for (int j = 0; j < mc_steps; ++j){
+            monte_carlo_step_layer_metropolis(bits, Q, T);
+        }
+        T *= 0.9;
     }
     auto end = chrono::high_resolution_clock::now();
     duration = chrono::duration_cast<chrono::milliseconds>(end - start).count();
