@@ -17,7 +17,7 @@ public:
   
   vector<vector<double>> init_jij();
 
-  pair<vector<int>, double> simulated_quantum_annealing(vector<vector<double>> Q) ;
+  pair<vector<int>, double> simulated_quantum_annealing(vector<vector<double>> Q,vector<pair<vector<int>,int>>nhot_memo) ;
   
 };
 

@@ -1,5 +1,5 @@
 #include "SimulatedQuantumAnnealing.h"
-#include "Algorithm.cpp"
+#include "Algorithm_swap.cpp"
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -18,22 +18,11 @@ vector<vector<double>> SimulatedQuantumAnnealing::init_jij()
 }
 
 
-double qubo_energy(const vector<int>& bits, const vector<vector<double>>& Q) {
-    int N = bits.size();
-    double energy = 0.0;
-    for (int j = 0; j < N; ++j) {
-        for (int k = j; k < N; ++k) {
-            energy += Q[j][k] * bits[j] * bits[k];
-        }
-    }
-    return energy;
-}
-
-pair<vector<int>, double> SimulatedQuantumAnnealing::simulated_quantum_annealing(vector<vector<double>> Q) 
+pair<vector<int>, double> SimulatedQuantumAnnealing::simulated_quantum_annealing(vector<vector<double>> Q,vector<pair<vector<int>,int>>nhot_memo) 
 {
-    vector<vector<int>> bits(L, vector<int>(N));
+    vector<vector<int>> bits(L, vector<int>(N,0));
     double duration = -1;
-    execute_annealing(bits,Q,L,N,T,anneal_steps,mc_steps,duration);
+    execute_annealing(bits,Q,L,N,T,anneal_steps,mc_steps,duration,nhot_memo);
 
     cout << "Execution time: " << duration << " ms" << endl;
 
