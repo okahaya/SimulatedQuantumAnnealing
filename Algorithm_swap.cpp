@@ -30,13 +30,21 @@ int randint(int low, int high)
     return dist(engine);
 }
 
-void monte_carlo_step_swap(vector<int>& bits, const vector<vector<double>>& Q, double T, double max_dE = 1000.0) {
+void monte_carlo_step_swap(vector<int>& bits, const vector<vector<double>>& Q, double T, vector<pair<vector<int>,int>>nhot_memo, double max_dE = 1000.0) {
     int N = bits.size();
     int bit1 = randint(0,N-1);
     int bit2 = -1;
+    //ビットが単一のnhotに含まれ、さらに含まれるbitの名前が連続である場合のみ有効
+    int temp;
+    for(int i=0;i<nhot_memo.size();++i){
+        if(nhot_memo[i].first[0] <= bit1 && bit1 <= nhot_memo[i].first[nhot_memo[i].first.size()-1]){
+        temp = i;
+        break;
+        }
+    }
     while (bit2 == -1){
-        int temp = randint(0,N-1);
-        if(temp != bit1)bit2 = temp;
+        int bit = randint(nhot_memo[temp].first[0],nhot_memo[temp].first[nhot_memo[temp].first.size()-1]);
+        if(bits[bit] != bits[bit1])bit2 = bit;
     }
     int current_bit1 = bits[bit1];
     int current_bit2 = bits[bit2];
@@ -54,19 +62,18 @@ void monte_carlo_step_swap(vector<int>& bits, const vector<vector<double>>& Q, d
 
 void execute_annealing(vector<vector<int>>& bits,vector<vector<double>> Q,int L,int N,int T,int anneal_steps,int mc_steps,double& duration,vector<pair<vector<int>,int>>nhot_memo){
     for (int i = 0; i < L; ++i) {
-        vector<bool>nhotIsOk(nhot_memo.size());
         for(int j = 0;j<nhot_memo.size();++j){
-            if(nhotIsOk[j] == true)continue;
             vector<int> selected_bits = nhot_memo[j].first;
             int n = nhot_memo[j].second;
-            vector<int> selected_random_number(selected_bits.size(),0);
+            vector<bool> Is_selected(selected_bits.size(),false);
             for(int k = 0;k<n;++k){
-                while(true){
+                bool loop = true;
+                while(loop==true){
                 int rand = randint(0,selected_bits.size()-1);
-                if(selected_random_number[rand] == 1)continue;
+                if(Is_selected[rand] == true)continue;
                 bits[i][selected_bits[rand]] = 1;
-                selected_bits[rand] = 1;
-                break;
+                Is_selected[rand] = true;
+                loop = false;
                 }
             }
         }
@@ -78,7 +85,7 @@ void execute_annealing(vector<vector<int>>& bits,vector<vector<double>> Q,int L,
         for (int i = 0; i < anneal_steps; ++i){
             for (int j = 0; j < mc_steps; ++j)
             {
-                monte_carlo_step_swap(bits[layer], Q, T);
+                monte_carlo_step_swap(bits[layer], Q, T, nhot_memo);
             }
         T *= 0.9;
         }
