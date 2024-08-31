@@ -2,6 +2,7 @@
 #include <complex>
 #include <iostream>
 #include <vector>
+#include <fstream>
 
 using namespace Eigen;
 using namespace std;
@@ -112,14 +113,23 @@ int main() {
         psi_values[i] = runge_kutta_step(t, psi_values[i - 1], dt);
     }
 
-    // 結果の出力
-    for (int j = 0; j < pow(2, n_qubits); ++j) {
-        cout << "Probability for state " << j << ": ";
-        for (int i = 0; i < num_steps; ++i) {
-            cout << abs(psi_values[i](j)) * abs(psi_values[i](j)) << " ";
+    // // 結果の出力
+    // for (int j = 0; j < pow(2, n_qubi    ts); ++j) {
+    //     cout << "Probability for state " << j << ": ";
+    //     for (int i = 0; i < num_steps; ++i) {
+    //         cout << abs(psi_values[i](j)) * abs(psi_values[i](j)) << " ";
+    //     }
+    //     cout << endl;
+    // }
+    ofstream outfile("simulation_data.csv");
+    for (int i = 0; i < num_steps; ++i) {
+        for (int j = 0; j < pow(2, n_qubits); ++j) {
+            outfile << norm(psi_values[i](j)) << (j < pow(2, n_qubits) - 1 ? "," : "");
         }
-        cout << endl;
+        outfile << endl;
     }
+    outfile.close();
+
     
     return 0;
 }
