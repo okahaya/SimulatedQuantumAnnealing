@@ -52,7 +52,7 @@ void monte_carlo_step_swap(vector<int>& bits, const vector<vector<double>>& Q, d
 
 }
 
-void execute_annealing(vector<vector<int>>& bits,vector<vector<double>> Q,int L,int N,int T,int anneal_steps,int mc_steps,double& duration,vector<pair<vector<int>,int>>nhot_memo){
+void execute_annealing(vector<vector<int>>& bits,vector<vector<double>> Q,int L,int N,double T,int anneal_steps,int mc_steps,double& duration,vector<pair<vector<int>,int>>nhot_memo){
     for (int i = 0; i < L; ++i) {
         for(int j = 0;j<nhot_memo.size();++j){
             vector<int> selected_bits = nhot_memo[j].first;
@@ -72,7 +72,7 @@ void execute_annealing(vector<vector<int>>& bits,vector<vector<double>> Q,int L,
     }
 
     auto start = chrono::high_resolution_clock::now();
-    #pragma omp parallel for num_threads(L)
+    #pragma omp parallel for
     for(int layer=0;layer<L;++layer){
         for (int i = 0; i < anneal_steps; ++i){
             for (int j = 0; j < mc_steps; ++j)
