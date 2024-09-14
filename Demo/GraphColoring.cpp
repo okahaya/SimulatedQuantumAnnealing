@@ -109,12 +109,12 @@ std::vector<std::vector<int>> split_into_chunks(const std::vector<int>& arr, int
 int main(){
     int num_reads = 10;
     int mc_steps = 10;
-    int anneal_steps = 10;
+    int anneal_steps = 1;
 
 
 
-    int h = 10;
-    int w = 10;
+    int h = 20;
+    int w = 20;
     int colors = 5; // num of colors
 
 

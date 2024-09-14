@@ -11,7 +11,6 @@
 #include <chrono>
 
 using namespace std;
-
     
 void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q, double T, double Gamma, vector<pair<vector<int>,int>>nhot_memo, double max_dE = 1000000.0) {
     int N = bits[0].size();
@@ -22,7 +21,7 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
     vector<vector<int>> swapped_bits(L,vector(3,0));
     const vector<vector<int>> current_bits = bits;
 
-    // #pragma omp parallel for
+    #pragma omp parallel for
     for(int i=0;i<L;++i){
         int layer = randint(0,L-1);
 
@@ -34,26 +33,37 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
 
         int before_bit1 = bits[layer][bit1];
         int before_bit2 = bits[layer][bit2];
-        swapped_bits[i] = {layer,bit1,bit2};
+
         bits[layer][bit1] = 1 - bits[layer][bit1];
         bits[layer][bit2] = 1 - bits[layer][bit2];
-        dE += (1 - 2* before_bit1) * (inner_product(Q[bit1].begin(), Q[bit1].end(), bits[layer].begin(), 0.0));
-        dE += (1 - 2* before_bit2) * (inner_product(Q[bit2].begin(), Q[bit2].end(), bits[layer].begin(), 0.0));
-    }
-    for(int i=0;i<L;++i){
-        int layer = swapped_bits[i][0];
-        int next_layer = (layer+1) % L;
-        int bit1 = swapped_bits[i][1];
-        int bit2 = swapped_bits[i][2];
-        dE += (Bt/L)*(2*bits[layer][bit1]-1)*(2*bits[next_layer][bit1]-1);
-        dE += (Bt/L)*(2*bits[layer][bit2]-1)*(2*bits[next_layer][bit2]-1);
-    }
-    dE = max(-max_dE, min(dE, max_dE));
+        
+        double delta_E = 0.0;
 
-    if (((double)rand() / RAND_MAX) >= exp(-dE / T)) {
-        bits = current_bits;
-    }
+        delta_E += calculate_delta_E(bits, Q, layer, bit1, bits[layer][bit1], Bt);
+        delta_E += calculate_delta_E(bits, Q, layer, bit2, bits[layer][bit2], Bt);
 
+        // swapped_bits[i] = {layer,bit1,bit2};
+        
+
+
+        // dE += (1 - 2* before_bit1) * (inner_product(Q[bit1].begin(), Q[bit1].end(), bits[layer].begin(), 0.0));
+        // dE += (1 - 2* before_bit2) * (inner_product(Q[bit2].begin(), Q[bit2].end(), bits[layer].begin(), 0.0));
+
+        // int next_layer = (layer+1) % L;
+        // int bit1 = swapped_bits[i][1];
+        // int bit2 = swapped_bits[i][2];
+
+        // dE += (Bt/L)*(2*bits[layer][bit1]-1)*(2*bits[next_layer][bit1]-1);
+        // dE += (Bt/L)*(2*bits[layer][bit2]-1)*(2*bits[next_layer][bit2]-1);
+        delta_E = max(-max_dE, min(delta_E, max_dE));
+        
+        // メトロポリス基準
+        if (rand_real() >= exp(-delta_E / T)) {
+            // 変更を元に戻す
+            bits[layer][bit1] = before_bit1;
+            bits[layer][bit2] = before_bit2;
+        }
+    }
 }
 
 void execute_annealing(vector<vector<int>>& bits,vector<vector<double>> Q,int L,int N,double T,double Gamma,int anneal_steps,int mc_steps,double &duration,vector<pair<vector<int>,int>>nhot_memo){
@@ -74,11 +84,14 @@ void execute_annealing(vector<vector<int>>& bits,vector<vector<double>> Q,int L,
             }
         }
     }
+
     const double coolingrate = init_coolingrate(anneal_steps);
     const double gamma = init_gamma(mc_steps);
     vector<int>energies;
+    
     auto start = chrono::high_resolution_clock::now();
-    #pragma omp parallel for
+    
+    // #pragma omp parallel for
     for (int i = 0; i < anneal_steps; ++i){
         for (int j = 0; j < mc_steps; ++j){
             monte_carlo_step(bits, Q, T, Gamma, nhot_memo);
