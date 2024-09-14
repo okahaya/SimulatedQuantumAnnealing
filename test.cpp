@@ -18,10 +18,10 @@ void generate_n_hot_qubo(vector<vector<double>>& Q,int start,int end, int n,vect
 
 int main(){
     cout << "start"<<endl;
-    int N = 1000; //total bits
+    int N = 10000; //total bits
     // N = N*N;
-    int L = 1;
-    int mc_steps = 10;
+    int L = 16; //num of trotter slices
+    int mc_steps = 100;
     int anneal_steps = 10;
     double T = 1;
     int num = 5; //num of selected bits
@@ -38,12 +38,12 @@ int main(){
     for(int i=0;i<N;i++){
         if(result.first[i]==1)one++;
     }
-    cout << "Best Solution: " << endl;
-    for(int i=0;i<N;++i){
-        if(i%10==0 && i!= 0)cout<<endl;
-        cout << result.first[i] << " ";
+    // cout << "Best Solution: " << endl;
+    // for(int i=0;i<N;++i){
+    //     if(i%10==0 && i!= 0)cout<<endl;
+    //     cout << result.first[i] << " ";
 
-    }cout << endl;
+    // }cout << endl;
     //cout << "Minimum energy: " << result.second << endl;
     cout << "number of ones: "<< one << endl;
     return 0;

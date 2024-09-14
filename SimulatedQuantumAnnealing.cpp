@@ -1,5 +1,5 @@
 #include "SimulatedQuantumAnnealing.h"
-#include "Algorithm_swap.cpp"
+#include "Algorithm/SwapSQA.cpp"
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -22,7 +22,8 @@ pair<vector<int>, double> SimulatedQuantumAnnealing::simulated_quantum_annealing
 {
     vector<vector<int>> bits(L, vector<int>(N,0));
     double duration = -1;
-    execute_annealing(bits,Q,L,N,T,anneal_steps,mc_steps,duration,nhot_memo);
+    double Gamma = 0.0000000001;
+    execute_annealing(bits,Q,L,N,T,Gamma,anneal_steps,mc_steps,duration,nhot_memo);
 
     cout << "Execution time: " << duration << " ms" << endl;
 

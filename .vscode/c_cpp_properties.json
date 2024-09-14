@@ -1,0 +1,27 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/Users/okaha/local",
+                "C:/Users/okaha/local/cpython-main/include",
+                "C:/Users/okaha/local/cpython-main/iOS/Resources",
+                "C:/Users/okaha/local/matplotlib-cpp-master",
+                "C:/Users/okaha/local/eigen-3.4.0",
+                "C:/Users/okaha/source/repos"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "windowsSdkVersion": "10.0.22621.0",
+            "compilerPath": "cl.exe",
+            "cStandard": "c17",
+            "cppStandard": "c++17",
+            "intelliSenseMode": "windows-msvc-x64"
+        }
+    ],
+    "version": 4
+}
