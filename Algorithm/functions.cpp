@@ -34,3 +34,18 @@ double init_gamma(int mc_steps){
     return gamma;
 }
 
+void showProgressBar(int progress, int total) {
+    int barWidth = 50; // 進捗バーの幅
+
+    float progressRatio = (float)progress / total;
+    int pos = barWidth * progressRatio;
+
+    std::cout << "[";
+    for (int i = 0; i < barWidth; ++i) {
+        if (i < pos) std::cout << "=";
+        else if (i == pos) std::cout << ">";
+        else std::cout << " ";
+    }
+    std::cout << "] " << int(progressRatio * 100.0) << " %\r";
+    std::cout.flush();
+}

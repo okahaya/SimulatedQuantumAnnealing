@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
+#include <omp.h>
 #include "../SimulatedQuantumAnnealing.cpp"
 
 void generate_n_hot_qubo(std::vector<std::vector<double>>& Q,int start,int end, int n,std::vector<std::pair<std::vector<int>,int>>& nhot_memo) {
@@ -18,7 +19,7 @@ void generate_n_hot_qubo(std::vector<std::vector<double>>& Q,int start,int end, 
 
 void GraphColoring(std::vector<std::vector<double>>& Q, std::pair<int,int>hw,int num_colors, std::vector<std::pair<std::vector<int>,int>>& nhot_memo){
     std::vector<int>colors(num_colors);
-    double c = 1;
+    double c = 10;
     for(int i=0;i<num_colors;++i){
         colors[i]=i;
     }
@@ -104,32 +105,17 @@ std::vector<std::vector<int>> split_into_chunks(const std::vector<int>& arr, int
     return result;
 }
 
-void showProgressBar(int progress, int total) {
-    int barWidth = 70; // 進捗バーの幅
-
-    float progressRatio = (float)progress / total;
-    int pos = barWidth * progressRatio;
-
-    std::cout << "[";
-    for (int i = 0; i < barWidth; ++i) {
-        if (i < pos) std::cout << "=";
-        else if (i == pos) std::cout << ">";
-        else std::cout << " ";
-    }
-    std::cout << "] " << int(progressRatio * 100.0) << " %\r";
-    std::cout.flush();
-}
 
 int main(){
-    int num_reads = 100;
+    int num_reads = 10;
     int mc_steps = 10;
-    int anneal_steps = 1;
+    int anneal_steps = 10;
 
 
 
-    int h = 5;
-    int w = 5;
-    int colors = 4; // num of colors
+    int h = 10;
+    int w = 10;
+    int colors = 5; // num of colors
 
 
     pair<int,int> hw = {h,w};
@@ -141,11 +127,15 @@ int main(){
     vector<pair<vector<int>,int>>nhot_memo;
     GraphColoring(Q,hw,colors,nhot_memo);
     vector<pair<vector<int>, double>> result;
+
+
     for(int queue=0;queue<num_reads;++queue){
         showProgressBar(queue, num_reads-1);
         pair<vector<int>, double> res = SQA.simulated_quantum_annealing(Q,nhot_memo);
         result.push_back(res);
-    }
+    }cout << endl;
+
+
     double min = 1e10;
     int best_queue = -1;
     for(int queue=0;queue<num_reads;++queue){
@@ -153,7 +143,7 @@ int main(){
             min = result[queue].second;
             best_queue = queue;
         }
-    }    std::cout << std::endl;
+    }
     std::vector<std::vector<int>> data = split_into_chunks(result[best_queue].first,colors);
 
     // CSVファイルに書き込むためのファイルストリームを開く

@@ -22,7 +22,7 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
     vector<vector<int>> swapped_bits(L,vector(3,0));
     const vector<vector<int>> current_bits = bits;
 
-    #pragma omp parallel for
+    // #pragma omp parallel for
     for(int i=0;i<L;++i){
         int layer = randint(0,L-1);
 
@@ -78,6 +78,7 @@ void execute_annealing(vector<vector<int>>& bits,vector<vector<double>> Q,int L,
     const double gamma = init_gamma(mc_steps);
     vector<int>energies;
     auto start = chrono::high_resolution_clock::now();
+    #pragma omp parallel for
     for (int i = 0; i < anneal_steps; ++i){
         for (int j = 0; j < mc_steps; ++j){
             monte_carlo_step(bits, Q, T, Gamma, nhot_memo);

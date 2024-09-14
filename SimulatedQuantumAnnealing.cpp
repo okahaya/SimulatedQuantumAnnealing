@@ -29,7 +29,7 @@ pair<vector<int>, double> SimulatedQuantumAnnealing::simulated_quantum_annealing
 
     double min_energy = numeric_limits<double>::infinity();
     vector<int> best_bits;
-    #pragma omp parallel for num_threads(L)
+    #pragma omp parallel for
     for (int layer = 0; layer < L; ++layer) {
         double layer_energy = qubo_energy(bits[layer], Q); 
         if (layer_energy <= min_energy) {
