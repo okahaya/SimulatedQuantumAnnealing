@@ -77,6 +77,18 @@ void GraphColoring(std::vector<std::vector<double>>& Q, std::pair<int,int>hw,int
     }
 }
 
+int evaluate(int h, int w,std::vector<std::vector<int>> result){
+    int ene = 0;
+    for(int i=0;i<h*w;++i){
+        for(int j=0;j<result[0].size();++j){
+            if(i>=w)ene+=result[i][j]*result[i-w][j];
+            if(i%w!=0)ene+=result[i][j]*result[i-1][j];
+            if(i%w!=w-1)ene+=result[i][j]*result[i+1][j];
+            if(i<h*w-w)ene+=result[i][j]*result[i+w][j];
+        }
+    }
+    return ene/2;
+}
 
 std::vector<std::vector<int>> split_into_chunks(const std::vector<int>& arr, int n) {
     std::vector<std::vector<int>> result;
@@ -92,29 +104,57 @@ std::vector<std::vector<int>> split_into_chunks(const std::vector<int>& arr, int
     return result;
 }
 
+void showProgressBar(int progress, int total) {
+    int barWidth = 70; // 進捗バーの幅
+
+    float progressRatio = (float)progress / total;
+    int pos = barWidth * progressRatio;
+
+    std::cout << "[";
+    for (int i = 0; i < barWidth; ++i) {
+        if (i < pos) std::cout << "=";
+        else if (i == pos) std::cout << ">";
+        else std::cout << " ";
+    }
+    std::cout << "] " << int(progressRatio * 100.0) << " %\r";
+    std::cout.flush();
+}
 
 int main(){
-    int L = 16; //num of trotter slices
+    int num_reads = 100;
     int mc_steps = 10;
-    int anneal_steps = 10;
-    double T = 1;
+    int anneal_steps = 1;
 
 
-    int h = 8;
-    int w = 8;
+
+    int h = 5;
+    int w = 5;
     int colors = 4; // num of colors
 
 
     pair<int,int> hw = {h,w};
     int size = h*w;// num of nodes
+    int L = 16; //num of trotter slices
+    double T = 1; // initialzie templature
     SimulatedQuantumAnnealing SQA = SimulatedQuantumAnnealing(size*colors,L,mc_steps,anneal_steps,T);
     auto Q = SQA.init_jij();
     vector<pair<vector<int>,int>>nhot_memo;
     GraphColoring(Q,hw,colors,nhot_memo);
-    pair<vector<int>, double> result = SQA.simulated_quantum_annealing(Q,nhot_memo);
-
-
-    std::vector<std::vector<int>> data = split_into_chunks(result.first,colors);
+    vector<pair<vector<int>, double>> result;
+    for(int queue=0;queue<num_reads;++queue){
+        showProgressBar(queue, num_reads-1);
+        pair<vector<int>, double> res = SQA.simulated_quantum_annealing(Q,nhot_memo);
+        result.push_back(res);
+    }
+    double min = 1e10;
+    int best_queue = -1;
+    for(int queue=0;queue<num_reads;++queue){
+        if(min>result[queue].second){
+            min = result[queue].second;
+            best_queue = queue;
+        }
+    }    std::cout << std::endl;
+    std::vector<std::vector<int>> data = split_into_chunks(result[best_queue].first,colors);
 
     // CSVファイルに書き込むためのファイルストリームを開く
     std::ofstream file("graphcolored.csv");
@@ -138,8 +178,8 @@ int main(){
 
     // ファイルを閉じる
     file.close();
-
+    int ene = evaluate(h,w,data);
     std::cout << "saved as csv" << std::endl;
-    std::cout << result.second << std::endl;
+    std::cout << ene << std::endl;
     return 0;
 }

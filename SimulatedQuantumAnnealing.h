@@ -13,7 +13,7 @@ private:
   double T;
 
 public:
-  SimulatedQuantumAnnealing(int N, int L = 10, int mc_steps = 100, int anneal_steps = 1000, double T = 1.0): N(N),L(L),mc_steps(mc_steps),anneal_steps(anneal_steps),T(T) {}
+  SimulatedQuantumAnnealing(int N, int L = 10, int mc_steps = 10, int anneal_steps = 10, double T = 1.0): N(N),L(L),mc_steps(mc_steps),anneal_steps(anneal_steps),T(T) {}
   
   vector<vector<double>> init_jij();
 

@@ -25,7 +25,7 @@ pair<vector<int>, double> SimulatedQuantumAnnealing::simulated_quantum_annealing
     double Gamma = 0.0000000001;
     execute_annealing(bits,Q,L,N,T,Gamma,anneal_steps,mc_steps,duration,nhot_memo);
 
-    cout << "Execution time: " << duration << " ms" << endl;
+    // std::cout << "Execution time: " << duration << " ms" << endl;
 
     double min_energy = numeric_limits<double>::infinity();
     vector<int> best_bits;
