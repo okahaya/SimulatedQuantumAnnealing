@@ -17,7 +17,6 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
     int L = bits.size();
     double Bt = T / 2 * log(tanh(Gamma / (L * T)));
 
-    // スレッドごとの乱数生成器を使用
     #pragma omp parallel
     {
         thread_local mt19937 rng(random_device{}());
@@ -25,7 +24,6 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
         uniform_int_distribution<int> dist_layer(0, L - 1);
         uniform_int_distribution<int> dist_nhot(0, nhot_memo.size() - 1);
 
-        // 各スレッドで必要な変数を宣言
         vector<int> local_bits;
 
         #pragma omp for
@@ -33,7 +31,7 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
             int layer = dist_layer(rng);
 
             const vector<int>& selected_nhot = nhot_memo[dist_nhot(rng)].first;
-            if (selected_nhot.size() < 2) continue; // スワップ可能なビットが少ない場合はスキップ
+            if (selected_nhot.size() < 2) continue;
 
             uniform_int_distribution<int> dist_bit(0, selected_nhot.size() - 1);
             int idx1 = dist_bit(rng);
@@ -47,21 +45,17 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
             int before_bit1 = bits[layer][bit1];
             int before_bit2 = bits[layer][bit2];
 
-            // ビットをフリップ
             bits[layer][bit1] = 1 - bits[layer][bit1];
             bits[layer][bit2] = 1 - bits[layer][bit2];
 
-            // エネルギー差分の計算
             double delta_E = 0.0;
             delta_E += calculate_delta_E(bits, Q, layer, bit1, bits[layer][bit1], Bt);
             delta_E += calculate_delta_E(bits, Q, layer, bit2, bits[layer][bit2], Bt);
 
-            // エネルギー差分の制限
             delta_E = max(-max_dE, min(delta_E, max_dE));
 
-            // メトロポリス基準
             if (dist_real(rng) >= exp(-delta_E / T)) {
-                // 変更を元に戻す
+
                 bits[layer][bit1] = before_bit1;
                 bits[layer][bit2] = before_bit2;
             }
@@ -71,10 +65,9 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
 
 
 void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& Q, int L, int N, double T, double Gamma, int anneal_steps, int mc_steps, double& duration, const vector<pair<vector<int>, int>>& nhot_memo) {
-    // 初期化
+
     bits.assign(L, vector<int>(N, 0));
 
-    // 初期状態の設定
     for (int i = 0; i < L; ++i) {
         for (const auto& nhot_pair : nhot_memo) {
             const vector<int>& selected_bits = nhot_pair.first;
