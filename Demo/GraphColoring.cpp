@@ -5,13 +5,14 @@
 #include "../SimulatedQuantumAnnealing.cpp"
 
 void generate_n_hot_qubo(std::vector<std::vector<double>>& Q,int start,int end, int n,std::vector<std::pair<std::vector<int>,int>>& nhot_memo) {
-    // for (int i = start; i < end; ++i) {
-    //     Q[i][i] = 1 - 2 * n;
-    //     for (int j = i + 1; j < end; ++j) {
-    //         Q[i][j] = 2;
-    //         Q[j][i] = 2;
-    //     }
-    // }
+    int k = 5;
+    for (int i = start; i < end; ++i) {
+        Q[i][i] = k*(1 - 2 * n);
+        for (int j = i + 1; j < end; ++j) {
+            Q[i][j] = k*2;
+            Q[j][i] = k*2;
+        }
+    }
     std::vector<int>temp;
     for(int i=start;i<end;++i)temp.push_back(i);
     nhot_memo.push_back(make_pair(temp,n));
@@ -107,9 +108,9 @@ std::vector<std::vector<int>> split_into_chunks(const std::vector<int>& arr, int
 
 
 int main(){
-    int num_reads = 10;
-    int mc_steps = 10;
-    int anneal_steps = 10;  
+    int num_reads = 1;
+    int mc_steps = 100;
+    int anneal_steps = 100;  
 
 
 
@@ -168,8 +169,8 @@ int main(){
 
     // ファイルを閉じる
     file.close();
-    int ene = evaluate(h,w,data);
+    // int ene = evaluate(h,w,data);
     std::cout << "saved as csv" << std::endl;
-    std::cout << ene << std::endl;
+    // std::cout << ene << std::endl;
     return 0;
 }
