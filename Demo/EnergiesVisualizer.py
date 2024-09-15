@@ -3,33 +3,29 @@ import numpy as np
 import csv
 
 if __name__ == "__main__":
-    # CSVファイルのパス
-    csv_file = 'energies.csv'
 
-    # 空の二次元配列を作成
-    array = []
+    csv_file = ['energies.csv','driver_energies.csv']
+    titles = [['Anneal Steps VS Energies','anneal step','qubo energy'],['Anneal Steps VS driver hamiltonian','anneal step','driver hamiltonian energy']]
+    
+    for que in range(2):
+        array = []
 
-    # CSVファイルを読み込む
-    with open(csv_file, newline='') as file:
-        reader = csv.reader(file)
-        for row in reader:
-            # 行ごとにリストに変換して二次元配列に追加
-            array.append([int(x) for x in row])
+        with open(csv_file[que], newline='') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                array.append([int(x) for x in row])
 
-    # グラフを作成
-    plt.figure(figsize=(10, 6))
+        plt.figure(figsize=(10, 6))
 
-    # 各行のデータをプロット
-    for i, row in enumerate(array):
-        plt.plot(row, label=f'Row {i+1}')
+        for i, row in enumerate(array):
+            plt.plot(row)
 
-    # グラフの設定
-    plt.title('Line Graph of Data')
-    plt.xlabel('Index')
-    plt.ylabel('Values')
-    plt.legend(loc='best')
-    plt.grid(True)
+        plt.title(titles[que][0])
+        plt.xlabel(titles[que][1])
+        plt.ylabel(titles[que][2])
+        plt.legend(loc='best')
+        plt.grid(True)
 
-    # グラフの表示
-    plt.tight_layout()
-    plt.show()
+        plt.tight_layout()
+        plt.show()
+    
