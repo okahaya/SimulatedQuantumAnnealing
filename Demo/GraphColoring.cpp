@@ -109,7 +109,7 @@ std::vector<std::vector<int>> split_into_chunks(const std::vector<int>& arr, int
 int main(){
     int num_reads = 10;
     int mc_steps = 10;
-    int anneal_steps = 1;
+    int anneal_steps = 10;  
 
 
 

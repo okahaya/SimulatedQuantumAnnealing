@@ -1,6 +1,7 @@
 #include <iostream>
 #include <vector>
 #include <random>
+#include <cmath>
 
 using namespace std;
 
@@ -10,8 +11,10 @@ double qubo_energy(const vector<int>& bits, const vector<vector<double>>& Q) {
     int N = bits.size();
     double energy = 0.0;
     for (int j = 0; j < N; ++j) {
+        if (bits[j] == 0) continue;
         for (int k = j; k < N; ++k) {
-            energy += Q[j][k] * bits[j] * bits[k];
+            if (bits[k] == 0) continue;
+            energy += Q[j][k];
         }
     }
     return energy;
@@ -21,18 +24,21 @@ int randint(int a, int b) {
     std::uniform_int_distribution<int> dist(a, b);
     return dist(rng);
 }
+
 double rand_real() {
     std::uniform_real_distribution<double> dist(0.0, 1.0);
     return dist(rng);
 }
     
 double init_coolingrate(int anneal_steps){
-    double cool = pow(10,-10/(double(anneal_steps)-1));
+    if (anneal_steps <= 1) return 1.0;
+    double cool = pow(0.1, 1.0 /(double(anneal_steps)-1));
     return cool;
 }
 
 double init_gamma(int mc_steps){
-    double gamma = pow(10,10/(double(mc_steps)-1));
+    if (mc_steps <= 1) return 1.0;
+    double gamma = pow(0.1, 1.0 /(double(mc_steps)-1));
     return gamma;
 }
 

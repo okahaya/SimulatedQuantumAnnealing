@@ -22,7 +22,9 @@ pair<vector<int>, double> SimulatedQuantumAnnealing::simulated_quantum_annealing
 {
     vector<vector<int>> bits(L, vector<int>(N,0));
     double duration = -1;
-    double Gamma = 0.00000001;
+    double Gamma = 1;
+
+
     execute_annealing(bits,Q,L,N,T,Gamma,anneal_steps,mc_steps,duration,nhot_memo);
 
     // std::cout << "Execution time: " << duration << " ms" << endl;

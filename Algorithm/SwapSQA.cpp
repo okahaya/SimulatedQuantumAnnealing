@@ -11,94 +11,99 @@
 #include <chrono>
 
 using namespace std;
-    
-void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q, double T, double Gamma, vector<pair<vector<int>,int>>nhot_memo, double max_dE = 1000000.0) {
+
+void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q, double T, double Gamma, const vector<pair<vector<int>, int>>& nhot_memo, double max_dE = 1e6) {
     int N = bits[0].size();
     int L = bits.size();
-    double dE = 0;
-    double Bt = T/2*log(tanh(Gamma/(L*T)));
+    double Bt = T / 2 * log(tanh(Gamma / (L * T)));
 
-    vector<vector<int>> swapped_bits(L,vector(3,0));
-    const vector<vector<int>> current_bits = bits;
+    // スレッドごとの乱数生成器を使用
+    #pragma omp parallel
+    {
+        thread_local mt19937 rng(random_device{}());
+        uniform_real_distribution<double> dist_real(0.0, 1.0);
+        uniform_int_distribution<int> dist_layer(0, L - 1);
+        uniform_int_distribution<int> dist_nhot(0, nhot_memo.size() - 1);
 
-    #pragma omp parallel for
-    for(int i=0;i<L;++i){
-        int layer = randint(0,L-1);
+        // 各スレッドで必要な変数を宣言
+        vector<int> local_bits;
 
-        int nhotsize = nhot_memo.size();
-        vector<int> selected_nhot = nhot_memo[randint(0,nhotsize-1)].first;
-        int bit1 = randint(0,selected_nhot.size()-1);
-        int bit2 = randint(0,selected_nhot.size()-1);
-        //ビットが単一のnhotに含まれる場合のみ有効
+        #pragma omp for
+        for (int i = 0; i < L; ++i) {
+            int layer = dist_layer(rng);
 
-        int before_bit1 = bits[layer][bit1];
-        int before_bit2 = bits[layer][bit2];
+            const vector<int>& selected_nhot = nhot_memo[dist_nhot(rng)].first;
+            if (selected_nhot.size() < 2) continue; // スワップ可能なビットが少ない場合はスキップ
 
-        bits[layer][bit1] = 1 - bits[layer][bit1];
-        bits[layer][bit2] = 1 - bits[layer][bit2];
-        
-        double delta_E = 0.0;
+            uniform_int_distribution<int> dist_bit(0, selected_nhot.size() - 1);
+            int idx1 = dist_bit(rng);
+            int idx2 = dist_bit(rng);
+            while (idx1 == idx2) {
+                idx2 = dist_bit(rng);
+            }
+            int bit1 = selected_nhot[idx1];
+            int bit2 = selected_nhot[idx2];
 
-        delta_E += calculate_delta_E(bits, Q, layer, bit1, bits[layer][bit1], Bt);
-        delta_E += calculate_delta_E(bits, Q, layer, bit2, bits[layer][bit2], Bt);
+            int before_bit1 = bits[layer][bit1];
+            int before_bit2 = bits[layer][bit2];
 
-        // swapped_bits[i] = {layer,bit1,bit2};
-        
+            // ビットをフリップ
+            bits[layer][bit1] = 1 - bits[layer][bit1];
+            bits[layer][bit2] = 1 - bits[layer][bit2];
 
+            // エネルギー差分の計算
+            double delta_E = 0.0;
+            delta_E += calculate_delta_E(bits, Q, layer, bit1, bits[layer][bit1], Bt);
+            delta_E += calculate_delta_E(bits, Q, layer, bit2, bits[layer][bit2], Bt);
 
-        // dE += (1 - 2* before_bit1) * (inner_product(Q[bit1].begin(), Q[bit1].end(), bits[layer].begin(), 0.0));
-        // dE += (1 - 2* before_bit2) * (inner_product(Q[bit2].begin(), Q[bit2].end(), bits[layer].begin(), 0.0));
+            // エネルギー差分の制限
+            delta_E = max(-max_dE, min(delta_E, max_dE));
 
-        // int next_layer = (layer+1) % L;
-        // int bit1 = swapped_bits[i][1];
-        // int bit2 = swapped_bits[i][2];
-
-        // dE += (Bt/L)*(2*bits[layer][bit1]-1)*(2*bits[next_layer][bit1]-1);
-        // dE += (Bt/L)*(2*bits[layer][bit2]-1)*(2*bits[next_layer][bit2]-1);
-        delta_E = max(-max_dE, min(delta_E, max_dE));
-        
-        // メトロポリス基準
-        if (rand_real() >= exp(-delta_E / T)) {
-            // 変更を元に戻す
-            bits[layer][bit1] = before_bit1;
-            bits[layer][bit2] = before_bit2;
+            // メトロポリス基準
+            if (dist_real(rng) >= exp(-delta_E / T)) {
+                // 変更を元に戻す
+                bits[layer][bit1] = before_bit1;
+                bits[layer][bit2] = before_bit2;
+            }
         }
     }
 }
 
-void execute_annealing(vector<vector<int>>& bits,vector<vector<double>> Q,int L,int N,double T,double Gamma,int anneal_steps,int mc_steps,double &duration,vector<pair<vector<int>,int>>nhot_memo){
+
+void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& Q, int L, int N, double T, double Gamma, int anneal_steps, int mc_steps, double& duration, const vector<pair<vector<int>, int>>& nhot_memo) {
+    // 初期化
+    bits.assign(L, vector<int>(N, 0));
+
+    // 初期状態の設定
     for (int i = 0; i < L; ++i) {
-        for(int j = 0;j<nhot_memo.size();++j){
-            vector<int> selected_bits = nhot_memo[j].first;
-            int n = nhot_memo[j].second;
-            vector<bool> Is_selected(selected_bits.size(),false);
-            for(int k = 0;k<n;++k){
-                bool loop = true;
-                while(loop==true){
-                int rand = randint(0,selected_bits.size()-1);
-                if(Is_selected[rand] == true)continue;
-                bits[i][selected_bits[rand]] = 1;
-                Is_selected[rand] = true;
-                loop = false;
-                }
+        for (const auto& nhot_pair : nhot_memo) {
+            const vector<int>& selected_bits = nhot_pair.first;
+            int n = nhot_pair.second;
+            vector<bool> is_selected(selected_bits.size(), false);
+            for (int k = 0; k < n; ++k) {
+                int rand_index;
+                do {
+                    rand_index = randint(0, selected_bits.size() - 1);
+                } while (is_selected[rand_index]);
+                bits[i][selected_bits[rand_index]] = 1;
+                is_selected[rand_index] = true;
             }
         }
     }
 
     const double coolingrate = init_coolingrate(anneal_steps);
     const double gamma = init_gamma(mc_steps);
-    vector<int>energies;
-    
+
     auto start = chrono::high_resolution_clock::now();
-    
-    // #pragma omp parallel for
-    for (int i = 0; i < anneal_steps; ++i){
-        for (int j = 0; j < mc_steps; ++j){
+
+    for (int i = 0; i < anneal_steps; ++i) {
+        for (int j = 0; j < mc_steps; ++j) {
             monte_carlo_step(bits, Q, T, Gamma, nhot_memo);
             Gamma *= gamma;
         }
         T *= coolingrate;
     }
+
     auto end = chrono::high_resolution_clock::now();
     duration = chrono::duration_cast<chrono::milliseconds>(end - start).count();
 }
