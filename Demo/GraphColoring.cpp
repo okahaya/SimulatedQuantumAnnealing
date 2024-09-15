@@ -19,7 +19,7 @@ void generate_n_hot_qubo(std::vector<std::vector<double>>& Q,int start,int end, 
 
 void GraphColoring(std::vector<std::vector<double>>& Q, std::pair<int,int>hw,int num_colors, std::vector<std::pair<std::vector<int>,int>>& nhot_memo){
     std::vector<int>colors(num_colors);
-    double c = 10;
+    double c = 1;
     for(int i=0;i<num_colors;++i){
         colors[i]=i;
     }
@@ -128,11 +128,11 @@ int main(){
     GraphColoring(Q,hw,colors,nhot_memo);
     vector<pair<vector<int>, double>> result;
 
-
+    showProgressBar(0, num_reads);
     for(int queue=0;queue<num_reads;++queue){
-        showProgressBar(queue, num_reads-1);
         pair<vector<int>, double> res = SQA.simulated_quantum_annealing(Q,nhot_memo);
         result.push_back(res);
+        showProgressBar(queue+1, num_reads);
     }cout << endl;
 
 
