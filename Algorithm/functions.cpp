@@ -64,9 +64,7 @@ double calculate_delta_E(const vector<vector<int>>& bits, const vector<vector<do
     int N = bits[0].size();
     int L = bits.size();
     const vector<int>& bits_layer = bits[layer];
-    int old_bit_value = bits_layer[bit_index];
-    int delta_bit = new_bit_value - old_bit_value;
-    if (delta_bit == 0) return 0.0;
+    int delta_bit = 2*new_bit_value - 1;
 
     // 古典的な相互作用のエネルギー差分を計算
     for (int j = 0; j < N; ++j) {
@@ -103,4 +101,22 @@ double calculate_delta_E_classical(const vector<int>& bits, const vector<vector<
 
 
     return delta_E;
+}
+
+vector<vector<double>> transpose(const vector<vector<double>>& matrix) {
+    if (matrix.empty()) return {};
+
+    int rows = matrix.size();
+    int cols = matrix[0].size();
+
+    // 転置された行列を生成（列数が元の行数、行数が元の列数）
+    vector<vector<double>> transposed(cols, vector<double>(rows));
+
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            transposed[j][i] = matrix[i][j];
+        }
+    }
+
+    return transposed;
 }
