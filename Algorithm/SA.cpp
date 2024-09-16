@@ -32,7 +32,7 @@ void execute_annealing(vector<vector<int>>& bits,vector<vector<double>> Q,int L,
         }
     }
     auto start = chrono::high_resolution_clock::now();
-    #pragma omp parallel for num_threads(L)
+    #pragma omp parallel for
     for(int layer=0;layer<L;++layer){
         for (int i = 0; i < anneal_steps; ++i){
             for (int j = 0; j < mc_steps; ++j)

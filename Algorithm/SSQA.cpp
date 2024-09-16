@@ -85,16 +85,16 @@ void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& 
     }
 
     const double coolingrate = init_coolingrate(anneal_steps);
-    const double gamma = init_gamma(mc_steps);
+    const double gamma = init_gamma(anneal_steps);
 
     auto start = chrono::high_resolution_clock::now();
 
     for (int i = 0; i < anneal_steps; ++i) {
         for (int j = 0; j < mc_steps; ++j) {
             monte_carlo_step(bits, Q, T, Gamma, nhot_memo);
-            Gamma *= gamma;
         }
         T *= coolingrate;
+        Gamma *= gamma;
     }
 
     auto end = chrono::high_resolution_clock::now();

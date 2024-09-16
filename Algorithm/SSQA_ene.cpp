@@ -19,14 +19,14 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
     // double Bt = 0;
     double Bt = T / 2 * log(tanh(Gamma / (L * T)));
 
-    #pragma omp parallel
+    // #pragma omp parallel
     {
         thread_local mt19937 rng(random_device{}());
         uniform_real_distribution<double> dist_real(0.0, 1.0);
         uniform_int_distribution<int> dist_layer(0, L - 1);
         uniform_int_distribution<int> dist_nhot(0, nhot_memo.size() - 1);
 
-        #pragma omp for
+        // #pragma omp for 
         for (int i = 0; i < L; ++i) {
             int layer = dist_layer(rng);
 
@@ -65,7 +65,7 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
 
 void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& Q, int L, int N, double T, double Gamma, int anneal_steps, int mc_steps, double& duration, const vector<pair<vector<int>, int>>& nhot_memo) {
     bits.assign(L, vector<int>(N, 0));
-
+    #pragma omp parallel for
     for (int i = 0; i < L; ++i) {
         for (const auto& nhot_pair : nhot_memo) {
             const vector<int>& selected_bits = nhot_pair.first;
@@ -83,16 +83,18 @@ void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& 
     }
 
     const double coolingrate = init_coolingrate(anneal_steps);
-    const double gamma = init_gamma(mc_steps);
+    const double gamma = init_gamma(anneal_steps);
 
 
     vector<vector<double>>energies(anneal_steps,vector<double>(L,0));
     vector<vector<double>>driver_energies(anneal_steps,vector<double>(L,0));
 
+    showProgressBar(0, anneal_steps,"annealing step");
+    
     for (int i = 0; i < anneal_steps; ++i) {
         for (int j = 0; j < mc_steps; ++j) {
+            
             monte_carlo_step(bits, Q, T, Gamma, nhot_memo);
-            Gamma *= gamma;
         }
         for (int k = 0; k < L; ++ k){
             energies[i][k] = qubo_energy(bits[k], Q);
@@ -101,6 +103,8 @@ void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& 
             driver_energies[i][k] = driver_energy(bits, k);
         }
         T *= coolingrate;
+        Gamma *= gamma;
+        showProgressBar(i+1, anneal_steps,"annealing step");
     }
 
 
