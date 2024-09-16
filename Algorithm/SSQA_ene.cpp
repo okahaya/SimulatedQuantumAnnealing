@@ -16,7 +16,6 @@ using namespace std;
 void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q, double T, double Gamma, const vector<pair<vector<int>, int>>& nhot_memo, double max_dE = 1e6) {
     int N = bits[0].size();
     int L = bits.size();
-    // double Bt = 0;
     double Bt = T / 2 * log(tanh(Gamma / (L * T)));
 
     // #pragma omp parallel
@@ -26,7 +25,7 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
         uniform_int_distribution<int> dist_layer(0, L - 1);
         uniform_int_distribution<int> dist_nhot(0, nhot_memo.size() - 1);
 
-        // #pragma omp for 
+        #pragma omp for 
         for (int i = 0; i < L; ++i) {
             int layer = dist_layer(rng);
 
@@ -82,6 +81,7 @@ void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& 
         }
     }
 
+
     const double coolingrate = init_coolingrate(anneal_steps);
     const double gamma = init_gamma(anneal_steps);
 
@@ -90,7 +90,9 @@ void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& 
     vector<vector<double>>driver_energies(anneal_steps,vector<double>(L,0));
 
     showProgressBar(0, anneal_steps,"annealing step");
-    
+    omp_set_num_threads(4);
+    #pragma omp parallel
+    {
     for (int i = 0; i < anneal_steps; ++i) {
         for (int j = 0; j < mc_steps; ++j) {
             
@@ -102,9 +104,14 @@ void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& 
         for (int k = 0; k < L; ++ k){
             driver_energies[i][k] = driver_energy(bits, k);
         }
-        T *= coolingrate;
-        Gamma *= gamma;
-        showProgressBar(i+1, anneal_steps,"annealing step");
+
+        int tid = omp_get_thread_num();
+        if(tid == 0){
+            showProgressBar(i+1, anneal_steps,"annealing step");
+            T *= coolingrate;
+            Gamma *= gamma;
+        }
+    }
     }
 
 
