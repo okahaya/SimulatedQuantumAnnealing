@@ -5,7 +5,7 @@
 #include "../SimulatedQuantumAnnealing.cpp"
 
 void generate_n_hot_qubo(std::vector<std::vector<double>>& Q,int start,int end, int n,std::vector<std::pair<std::vector<int>,int>>& nhot_memo) {
-    int k = 5;
+    int k = 0;
     for (int i = start; i < end; ++i) {
         Q[i][i] = k*(1 - 2 * n);
         for (int j = i + 1; j < end; ++j) {
@@ -121,19 +121,27 @@ int main(){
 
     pair<int,int> hw = {h,w};
     int size = h*w;// num of nodes
-    int L = 16; //num of trotter slices
-    double T = 1; // initialzie templature
+    int L = 4; //num of trotter slices
+    double T = 1.0; // initialzie templature
     SimulatedQuantumAnnealing SQA = SimulatedQuantumAnnealing(size*colors,L,mc_steps,anneal_steps,T);
     auto Q = SQA.init_jij();
     vector<pair<vector<int>,int>>nhot_memo;
     GraphColoring(Q,hw,colors,nhot_memo);
     vector<pair<vector<int>, double>> result;
 
-    showProgressBar(0, num_reads);
+    vector<double>duration;
+
+    showProgressBar(0, num_reads,"numreads");
     for(int queue=0;queue<num_reads;++queue){
+        auto start = chrono::high_resolution_clock::now();
+    
         pair<vector<int>, double> res = SQA.simulated_quantum_annealing(Q,nhot_memo);
         result.push_back(res);
-        showProgressBar(queue+1, num_reads);
+        showProgressBar(queue+1, num_reads,"numreads");
+
+            
+        auto end = chrono::high_resolution_clock::now();
+        duration.push_back(chrono::duration_cast<chrono::milliseconds>(end - start).count());
     }cout << endl;
 
 
@@ -172,5 +180,10 @@ int main(){
     // int ene = evaluate(h,w,data);
     std::cout << "saved as csv" << std::endl;
     // std::cout << ene << std::endl;
+
+    cout << duration[0];
+    for(int i = 1;i < num_reads; ++i) cout <<" "<< duration[i] ;
+    cout << endl;
+
     return 0;
 }
