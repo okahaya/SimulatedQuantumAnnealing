@@ -57,22 +57,20 @@ double init_gamma(int mc_steps){
     return gamma;
 }
 
-void showProgressBar(int progress, int total) {
-    int barWidth = 50; // 進捗バーの幅
+void showProgressBar(int current, int total, const std::string& label) {
+    int bar_width = 50;
+    float progress = (float)current / total;
 
-    float progressRatio = (float)progress / total;
-    int pos = barWidth * progressRatio;
-
-    std::cout << "[";
-    for (int i = 0; i < barWidth; ++i) {
+    std::cout << label << " [";
+    int pos = bar_width * progress;
+    for (int i = 0; i < bar_width; ++i) {
         if (i < pos) std::cout << "=";
         else if (i == pos) std::cout << ">";
         else std::cout << " ";
     }
-    std::cout << "] " << int(progressRatio * 100.0) << " %\r";
+    std::cout << "] " << int(progress * 100.0) << " %\r";
     std::cout.flush();
 }
-
 
 double calculate_delta_E(const vector<vector<int>>& bits, const vector<vector<double>>& Q, int layer, int bit_index, int new_bit_value, double Bt) {
     double delta_E = 0.0;
