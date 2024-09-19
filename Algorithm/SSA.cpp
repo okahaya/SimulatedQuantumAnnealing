@@ -67,6 +67,8 @@ void execute_annealing(vector<vector<int>>& bits,vector<vector<double>> Q,int L,
             }
         }
     }
+    
+    const double coolingrate = init_coolingrate(anneal_steps);
     auto start = chrono::high_resolution_clock::now();
     #pragma omp parallel for private(T)
     for(int layer=0;layer<L;++layer){
@@ -76,7 +78,7 @@ void execute_annealing(vector<vector<int>>& bits,vector<vector<double>> Q,int L,
             {
                 monte_carlo_step_swap(bits_of_this_layer, Q, T, nhot_memo);
             }
-            T *= 0.9;
+            T *= coolingrate;
         }
         bits[layer] = bits_of_this_layer;
     }

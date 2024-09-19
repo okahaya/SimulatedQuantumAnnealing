@@ -72,7 +72,7 @@ void showProgressBar(int current, int total, const std::string& label) {
     std::cout.flush();
 }
 
-double calculate_delta_E(const vector<vector<int>>& bits, const vector<vector<double>>& Q, int layer, int bit_index, int new_bit_value, double Bt) {
+double calculate_delta_E(const vector<vector<int>>& bits, const vector<vector<double>>& Q, int layer, int bit_index, int new_bit_value, double At, double Bt) {
     double delta_E = 0.0;
     int N = bits[0].size();
     int L = bits.size();
@@ -85,6 +85,7 @@ double calculate_delta_E(const vector<vector<int>>& bits, const vector<vector<do
         }
     }
     delta_E *= delta_bit;
+    delta_E *= At;
 
     int next_layer = (layer + 1) % L;
     int prev_layer = (layer - 1 + L) % L;
