@@ -22,6 +22,10 @@ void SimulatedQuantumAnnealing::init_default_bit(vector<int>& bit) {
     bit_initialized = true;
 }
 
+void SimulatedQuantumAnnealing::init_bool_bit_initialized() {
+    bit_initialized = false;
+}
+
 pair<vector<int>, double> SimulatedQuantumAnnealing::simulated_quantum_annealing(vector<vector<double>> Q,vector<pair<vector<int>,int>>nhot_memo) 
 {
     vector<vector<int>> bits(L, vector<int>(N,0));
@@ -46,7 +50,7 @@ pair<vector<int>, double> SimulatedQuantumAnnealing::simulated_quantum_annealing
             best_bits = bits[layer];
         }
     }
-
+    init_bool_bit_initialized();
     min_energy = qubo_energy(best_bits, Q);
     return {best_bits, min_energy};
 }

@@ -78,7 +78,7 @@ void GraphColoring(std::vector<std::vector<double>>& Q, std::pair<int,int>hw,int
     }
 }
 
-void PreAnnealing(SimulatedQuantumAnnealing SQA, std::vector<std::vector<double>> Q, std::pair<int,int>hw, int num_colors, std::vector<std::pair<std::vector<int>,int>> nhot_memo) {
+void PreAnnealing(SimulatedQuantumAnnealing& SQA, std::vector<std::vector<double>> Q, std::pair<int,int>hw, int num_colors, std::vector<std::pair<std::vector<int>,int>> nhot_memo) {
     int h = hw.first;
     int w = hw.second;
     int size = h*w;
