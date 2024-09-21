@@ -19,7 +19,7 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
     double Bt = -1.0 / 2.0 * log(tanh(Gamma / (L * T)));
     double At = 1/ (L * T);
     // cout << At <<endl;
-    // cout << Bt << endl;
+    // cout << Bt/At << endl;
     // #pragma omp parallel
     {
         thread_local mt19937 rng(random_device{}());
@@ -122,13 +122,6 @@ void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& 
 
     ofstream file1("energies.csv");
     ofstream file2("driver_energies.csv");
-
-    if (!file1.is_open()) {
-        std::cerr << "ファイルを開けませんでした" << std::endl;
-    }
-    if (!file2.is_open()) {
-        std::cerr << "ファイルを開けませんでした" << std::endl;
-    }
 
     for (const auto& row : energies) {
         for (size_t i = 0; i < row.size(); ++i) {
