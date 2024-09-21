@@ -1,4 +1,4 @@
-#include "functions.cpp"
+// #include "functions.cpp"
 #include <iostream>
 #include <vector>
 #include <cmath>
@@ -12,7 +12,7 @@
 using namespace std;
 
 
-void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q, double T, double Gamma, const vector<pair<vector<int>, int>>& nhot_memo, double max_dE = 1e6) {
+void saq_monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q, double T, double Gamma, const vector<pair<vector<int>, int>>& nhot_memo, double max_dE = 1e6) {
     int N = bits[0].size();
     int L = bits.size();
     double Bt = -1.0 / 2.0 * log(tanh(Gamma / (L * T)));
@@ -47,7 +47,7 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
     }
 }
 
-void execute_annealing(vector<vector<int>>& bits,vector<vector<double>> Q,int L,int N,double T, double Gamma,int anneal_steps,int mc_steps,double& duration,vector<pair<vector<int>,int>>nhot_memo){
+void saq_execute_annealing(vector<vector<int>>& bits,vector<vector<double>> Q,int L,int N,double T, double Gamma,int anneal_steps,int mc_steps,double& duration,vector<pair<vector<int>,int>>nhot_memo){
     
     for (int i = 0; i < L; ++i) {
         for (int j = 0; j < N; ++j) {
@@ -57,15 +57,39 @@ void execute_annealing(vector<vector<int>>& bits,vector<vector<double>> Q,int L,
 
     const double coolingrate = init_coolingrate(anneal_steps);
     const double gamma = init_gamma(mc_steps);
-    vector<int>energies;
-    auto start = chrono::high_resolution_clock::now();
+    vector<vector<double>>energies(anneal_steps,vector<double>(L,0));
+
+    showProgressBar(0, anneal_steps,"annealing step");
+    omp_set_num_threads(1);
+    #pragma omp parallel
     for (int i = 0; i < anneal_steps; ++i){
         for (int j = 0; j < mc_steps; ++j){
-            monte_carlo_step(bits, Q, T, Gamma, nhot_memo);
+            saq_monte_carlo_step(bits, Q, T, Gamma, nhot_memo);
+        }
+        for (int k = 0; k < L; ++ k){
+            energies[i][k] = qubo_energy(bits[k], Q);
+        }
+
+        int tid = omp_get_thread_num();
+        if(tid == 0){
+            showProgressBar(i+1, anneal_steps,"annealing step");
+            T *= coolingrate;
             Gamma *= gamma;
         }
-        T *= coolingrate;
     }
-    auto end = chrono::high_resolution_clock::now();
-    duration = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+    
+    energies = transpose(energies);
+    ofstream file1("preannealing_energies.csv");
+
+    for (const auto& row : energies) {
+        for (size_t i = 0; i < row.size(); ++i) {
+            file1 << row[i];
+            if (i < row.size() - 1) {
+                file1 << ","; 
+            }
+        }
+        file1 << "\n";  
+    }
+
+    file1.close();
 }

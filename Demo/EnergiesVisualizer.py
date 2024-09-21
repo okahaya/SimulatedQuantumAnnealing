@@ -4,10 +4,10 @@ import csv
 
 if __name__ == "__main__":
 
-    csv_file = ['energies.csv','driver_energies.csv']
-    titles = [['Anneal Steps VS Energies','anneal step','qubo energy'],['Anneal Steps VS driver hamiltonian','anneal step','driver hamiltonian energy']]
+    csv_file = ['preannealing_energies.csv','energies.csv','driver_energies.csv']
+    titles = [['Anneal Steps VS Energies','anneal step','qubo energy'],['Anneal Steps VS Energies','anneal step','qubo energy'],['Anneal Steps VS driver hamiltonian','anneal step','driver hamiltonian energy']]
     
-    for que in range(2):
+    for que in range(3):
         array = []
 
         with open(csv_file[que], newline='') as file:

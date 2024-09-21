@@ -19,11 +19,15 @@ public:
   
   vector<vector<double>> init_jij();
 
-  pair<vector<int>, double> simulated_quantum_annealing(vector<vector<double>> Q,vector<pair<vector<int>,int>>nhot_memo) ;
+  pair<vector<int>, double> swaq(vector<vector<double>> Q,vector<pair<vector<int>,int>>nhot_memo) ;
   
-  void init_bool_bit_initialized();
+  vector<int> create_default_bit(vector<vector<double>> Q,vector<pair<vector<int>,int>>nhot_memo);
 
-  void init_default_bit(vector<int> &bit);
+  void bit_initialized_true();
+
+  void bit_initialized_false();
+
+  void init_default_bit(vector<int> bit);
   
 };
 

@@ -66,7 +66,6 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
 
 void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& Q, int L, int N, double T, double Gamma, int anneal_steps, int mc_steps, double& duration, const vector<pair<vector<int>, int>>& nhot_memo, bool bit_initialized) {
     if (bit_initialized == true) {}
-
     else {
         bits.assign(L, vector<int>(N, 0));
         #pragma omp parallel for
@@ -96,7 +95,7 @@ void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& 
     vector<vector<double>>driver_energies(anneal_steps,vector<double>(L,0));
 
     showProgressBar(0, anneal_steps,"annealing step");
-    omp_set_num_threads(4);
+    omp_set_num_threads(1);
     #pragma omp parallel
     {
     for (int i = 0; i < anneal_steps; ++i) {

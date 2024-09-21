@@ -78,17 +78,17 @@ void GraphColoring(std::vector<std::vector<double>>& Q, std::pair<int,int>hw,int
     }
 }
 
-void PreAnnealing(SimulatedQuantumAnnealing& SQA, std::vector<std::vector<double>> Q, std::pair<int,int>hw, int num_colors, std::vector<std::pair<std::vector<int>,int>> nhot_memo) {
+void PreAnnealing(SimulatedQuantumAnnealing& SQA, std::pair<int,int>hw, int num_colors) {
+    vector<pair<vector<int>,int>>nhot_memo; 
+    auto preQ = SQA.init_jij();
     int h = hw.first;
     int w = hw.second;
     int size = h*w;
     for(int i=0;i<size;++i){
-        generate_n_hot_qubo(Q,i*num_colors,(1+i)*num_colors,1,nhot_memo,1);   
+        generate_n_hot_qubo(preQ,i*num_colors,(1+i)*num_colors,1,nhot_memo,1);   
     }
-
-    vector<int>res = SQA.simulated_quantum_annealing(Q,nhot_memo).first;
     
-    SQA.init_default_bit(res);
+    SQA.init_default_bit(SQA.create_default_bit(preQ,nhot_memo));
 }
 
 int evaluate(int h, int w,std::vector<std::vector<int>> result){
@@ -123,9 +123,8 @@ int main(){
     int anneal_steps = 100;  
 
 
-
-    int h = 10;
-    int w = 10;
+    int h = 20;
+    int w = 20;
     int colors = 4; // num of colors
 
 
@@ -138,8 +137,8 @@ int main(){
 
     vector<pair<vector<int>,int>>nhot_memo;    
 
-    PreAnnealing(SQA,Q,hw,colors,nhot_memo);
-
+    PreAnnealing(SQA,hw,colors);
+    // return 0;
     GraphColoring(Q,hw,colors,nhot_memo);
 
     vector<pair<vector<int>, double>> result;
@@ -149,7 +148,7 @@ int main(){
     for(int queue=0;queue<num_reads;++queue){
         auto start = chrono::high_resolution_clock::now();
     
-        pair<vector<int>, double> res = SQA.simulated_quantum_annealing(Q,nhot_memo);
+        pair<vector<int>, double> res = SQA.swaq(Q,nhot_memo);
         result.push_back(res);
         showProgressBar(queue+1, num_reads,"numreads");
 
