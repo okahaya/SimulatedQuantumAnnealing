@@ -64,21 +64,25 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
 }
 
 
-void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& Q, int L, int N, double T, double Gamma, int anneal_steps, int mc_steps, double& duration, const vector<pair<vector<int>, int>>& nhot_memo) {
-    bits.assign(L, vector<int>(N, 0));
-    #pragma omp parallel for
-    for (int i = 0; i < L; ++i) {
-        for (const auto& nhot_pair : nhot_memo) {
-            const vector<int>& selected_bits = nhot_pair.first;
-            int n = nhot_pair.second;
-            vector<bool> is_selected(selected_bits.size(), false);
-            for (int k = 0; k < n; ++k) {
-                int rand_index;
-                do {
-                    rand_index = randint(0, selected_bits.size() - 1);
-                } while (is_selected[rand_index]);
-                bits[i][selected_bits[rand_index]] = 1;
-                is_selected[rand_index] = true;
+void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& Q, int L, int N, double T, double Gamma, int anneal_steps, int mc_steps, double& duration, const vector<pair<vector<int>, int>>& nhot_memo, bool bit_initialized) {
+    if (bit_initialized == true) {}
+    
+    else {
+        bits.assign(L, vector<int>(N, 0));
+        #pragma omp parallel for
+        for (int i = 0; i < L; ++i) {
+            for (const auto& nhot_pair : nhot_memo) {
+                const vector<int>& selected_bits = nhot_pair.first;
+                int n = nhot_pair.second;
+                vector<bool> is_selected(selected_bits.size(), false);
+                for (int k = 0; k < n; ++k) {
+                    int rand_index;
+                    do {
+                        rand_index = randint(0, selected_bits.size() - 1);
+                    } while (is_selected[rand_index]);
+                    bits[i][selected_bits[rand_index]] = 1;
+                    is_selected[rand_index] = true;
+                }
             }
         }
     }

@@ -15,9 +15,9 @@ using namespace std;
 void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q, double T, double Gamma, const vector<pair<vector<int>, int>>& nhot_memo, double max_dE = 1e6) {
     int N = bits[0].size();
     int L = bits.size();
-    double Bt = T / 2 * log(tanh(Gamma / (L * T)));
+    double Bt = -1.0 / 2.0 * log(tanh(Gamma / (L * T)));
+    double At = 1/ (L * T);
 
-    #pragma omp parallel
     {
         thread_local mt19937 rng(random_device{}());
         uniform_real_distribution<double> dist_real(0.0, 1.0);
@@ -36,7 +36,7 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
             bits[layer][bit] = 1 - bits[layer][bit];
             
             double delta_E = 0.0;
-            delta_E += calculate_delta_E(bits, Q, layer, bit, bits[layer][bit], Bt);
+            delta_E += calculate_delta_E(bits, Q, layer, bit, bits[layer][bit], At, Bt);
         
             delta_E = max(-max_dE, min(delta_E, max_dE));
 

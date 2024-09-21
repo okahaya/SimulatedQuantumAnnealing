@@ -17,15 +17,22 @@ vector<vector<double>> SimulatedQuantumAnnealing::init_jij()
     return vector<vector<double>>(N, vector<double>(N, 0.0));
 }
 
+void SimulatedQuantumAnnealing::init_default_bit(vector<int>& bit) {
+    default_bit = bit;
+    bit_initialized = true;
+}
 
 pair<vector<int>, double> SimulatedQuantumAnnealing::simulated_quantum_annealing(vector<vector<double>> Q,vector<pair<vector<int>,int>>nhot_memo) 
 {
     vector<vector<int>> bits(L, vector<int>(N,0));
+    if (bit_initialized == true) {
+        for (int i = 0; i < L; ++i) bits[i] = default_bit;
+    } 
     double duration = -1;
     double Gamma = 5.0;
 
 
-    execute_annealing(bits,Q,L,N,T,Gamma,anneal_steps,mc_steps,duration,nhot_memo);
+    execute_annealing(bits,Q,L,N,T,Gamma,anneal_steps,mc_steps,duration,nhot_memo,bit_initialized);
 
     // std::cout << "Execution time: " << duration << " ms" << endl;
 

@@ -4,8 +4,7 @@
 #include <omp.h>
 #include "../SimulatedQuantumAnnealing.cpp"
 
-void generate_n_hot_qubo(std::vector<std::vector<double>>& Q,int start,int end, int n,std::vector<std::pair<std::vector<int>,int>>& nhot_memo) {
-    int k = 0;
+void generate_n_hot_qubo(std::vector<std::vector<double>>& Q,int start,int end, int n,std::vector<std::pair<std::vector<int>,int>>& nhot_memo, int k) {
     for (int i = start; i < end; ++i) {
         Q[i][i] = k*(1 - 2 * n);
         for (int j = i + 1; j < end; ++j) {
@@ -75,8 +74,21 @@ void GraphColoring(std::vector<std::vector<double>>& Q, std::pair<int,int>hw,int
 
     }
     for(int i=0;i<size;++i){
-        generate_n_hot_qubo(Q,i*num_colors,(1+i)*num_colors,1,nhot_memo);   
+        generate_n_hot_qubo(Q,i*num_colors,(1+i)*num_colors,1,nhot_memo,0);   
     }
+}
+
+void PreAnnealing(SimulatedQuantumAnnealing SQA, std::vector<std::vector<double>> Q, std::pair<int,int>hw, int num_colors, std::vector<std::pair<std::vector<int>,int>> nhot_memo) {
+    int h = hw.first;
+    int w = hw.second;
+    int size = h*w;
+    for(int i=0;i<size;++i){
+        generate_n_hot_qubo(Q,i*num_colors,(1+i)*num_colors,1,nhot_memo,1);   
+    }
+
+    vector<int>res = SQA.simulated_quantum_annealing(Q,nhot_memo).first;
+    
+    SQA.init_default_bit(res);
 }
 
 int evaluate(int h, int w,std::vector<std::vector<int>> result){
@@ -96,9 +108,7 @@ std::vector<std::vector<int>> split_into_chunks(const std::vector<int>& arr, int
     std::vector<std::vector<int>> result;
     size_t size = arr.size();
     
-    // n要素ずつ分割して二次元配列に格納
     for (size_t i = 0; i < size; i += n) {
-        // 配列の末尾に近づいた場合の処理
         std::vector<int> chunk(arr.begin() + i, arr.begin() + std::min(i + n, size));
         result.push_back(chunk);
     }
@@ -114,9 +124,9 @@ int main(){
 
 
 
-    int h = 20;
-    int w = 20;
-    int colors = 5; // num of colors
+    int h = 10;
+    int w = 10;
+    int colors = 4; // num of colors
 
 
     pair<int,int> hw = {h,w};
@@ -125,10 +135,14 @@ int main(){
     double T = 1.0; // initialzie templature
     SimulatedQuantumAnnealing SQA = SimulatedQuantumAnnealing(size*colors,L,mc_steps,anneal_steps,T);
     auto Q = SQA.init_jij();
-    vector<pair<vector<int>,int>>nhot_memo;
-    GraphColoring(Q,hw,colors,nhot_memo);
-    vector<pair<vector<int>, double>> result;
 
+    vector<pair<vector<int>,int>>nhot_memo;    
+
+    PreAnnealing(SQA,Q,hw,colors,nhot_memo);
+
+    GraphColoring(Q,hw,colors,nhot_memo);
+
+    vector<pair<vector<int>, double>> result;
     vector<double>duration;
 
     showProgressBar(0, num_reads,"numreads");
@@ -155,27 +169,18 @@ int main(){
     }
     std::vector<std::vector<int>> data = split_into_chunks(result[best_queue].first,colors);
 
-    // CSVファイルに書き込むためのファイルストリームを開く
     std::ofstream file("graphcolored.csv");
 
-    // ファイルが正しく開けたかを確認
-    if (!file.is_open()) {
-        std::cerr << "ファイルを開けませんでした" << std::endl;
-        return 1;
-    }
-
-    // 2次元配列のデータをCSV形式で書き込む
     for (const auto& row : data) {
         for (size_t i = 0; i < row.size(); ++i) {
             file << row[i];
             if (i < row.size() - 1) {
-                file << ",";  // カンマで区切る
+                file << ",";
             }
         }
-        file << "\n";  // 行の終わりに改行を追加
+        file << "\n"; 
     }
 
-    // ファイルを閉じる
     file.close();
     // int ene = evaluate(h,w,data);
     std::cout << "saved as csv" << std::endl;

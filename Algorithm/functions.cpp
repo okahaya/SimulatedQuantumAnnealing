@@ -129,3 +129,19 @@ vector<vector<double>> transpose(const vector<vector<double>>& matrix) {
 
     return transposed;
 }
+
+void generate_n_hot_qubo(std::vector<std::vector<double>>& Q,const std::vector<std::pair<std::vector<int>,int>> nhot_memo) {
+    int k = 1;
+    for (int q = 0; q < nhot_memo.size(); ++q) {
+        int n = nhot_memo[q].second;
+        int start = nhot_memo[q].first[0];
+        int end = nhot_memo[q].first[nhot_memo[q].first.size()];
+        for (int i = start; i < end; ++i) {
+            Q[i][i] = k*(1 - 2 * n);
+            for (int j = i + 1; j < end; ++j) {
+                Q[i][j] = k*2;
+                Q[j][i] = k*2;
+            }
+        }
+    }
+}

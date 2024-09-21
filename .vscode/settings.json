@@ -67,6 +67,26 @@
         "lu": "cpp",
         "cholesky": "cpp",
         "geometry": "cpp",
-        "fstream": "cpp"
+        "fstream": "cpp",
+        "array": "cpp",
+        "cinttypes": "cpp",
+        "condition_variable": "cpp",
+        "coroutine": "cpp",
+        "deque": "cpp",
+        "functional": "cpp",
+        "future": "cpp",
+        "list": "cpp",
+        "mutex": "cpp",
+        "queue": "cpp",
+        "ranges": "cpp",
+        "set": "cpp",
+        "span": "cpp",
+        "stop_token": "cpp",
+        "thread": "cpp",
+        "unordered_map": "cpp",
+        "unordered_set": "cpp",
+        "valarray": "cpp",
+        "variant": "cpp",
+        "xhash": "cpp"
     }
 }
