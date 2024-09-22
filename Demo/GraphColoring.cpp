@@ -104,17 +104,7 @@ int evaluate(int h, int w,std::vector<std::vector<int>> result){
     return ene/2;
 }
 
-std::vector<std::vector<int>> split_into_chunks(const std::vector<int>& arr, int n) {
-    std::vector<std::vector<int>> result;
-    size_t size = arr.size();
-    
-    for (size_t i = 0; i < size; i += n) {
-        std::vector<int> chunk(arr.begin() + i, arr.begin() + std::min(i + n, size));
-        result.push_back(chunk);
-    }
 
-    return result;
-}
 
 
 int main(){
@@ -138,7 +128,6 @@ int main(){
     vector<pair<vector<int>,int>>nhot_memo;    
 
     PreAnnealing(SQA,hw,colors);
-    // return 0;
     GraphColoring(Q,hw,colors,nhot_memo);
 
     vector<pair<vector<int>, double>> result;
@@ -166,24 +155,8 @@ int main(){
             best_queue = queue;
         }
     }
-    std::vector<std::vector<int>> data = split_into_chunks(result[best_queue].first,colors);
-
-    std::ofstream file("graphcolored.csv");
-
-    for (const auto& row : data) {
-        for (size_t i = 0; i < row.size(); ++i) {
-            file << row[i];
-            if (i < row.size() - 1) {
-                file << ",";
-            }
-        }
-        file << "\n"; 
-    }
-
-    file.close();
-    // int ene = evaluate(h,w,data);
-    std::cout << "saved as csv" << std::endl;
-    // std::cout << ene << std::endl;
+  
+    bit_to_csv(result[best_queue].first,colors,"graphcolored");
 
     cout << duration[0];
     for(int i = 1;i < num_reads; ++i) cout <<" "<< duration[i] ;

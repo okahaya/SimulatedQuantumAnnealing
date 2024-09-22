@@ -41,6 +41,8 @@ vector<int> SimulatedQuantumAnnealing::create_default_bit(vector<vector<double>>
         }
     }
     min_energy = qubo_energy(best_bits, Q);
+    // for debug
+    // bit_to_csv(best_bits,4,"defaultbit");
     return best_bits;
 }
 

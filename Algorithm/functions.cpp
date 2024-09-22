@@ -58,21 +58,23 @@ double init_gamma(int anneal_steps){
 }
 
 void showProgressBar(int current, int total, const std::string& label) {
-    int bar_width = 50;
-    float progress = (float)current / total;
+    if (total != 1){
+        int bar_width = 50;
+        float progress = (float)current / total;
 
-    std::cout << label << " [";
-    int pos = bar_width * progress;
-    for (int i = 0; i < bar_width; ++i) {
-        if (i < pos) std::cout << "=";
-        else if (i == pos) std::cout << ">";
-        else std::cout << " ";
+        std::cout << label << " [";
+        int pos = bar_width * progress;
+        for (int i = 0; i < bar_width; ++i) {
+            if (i < pos) std::cout << "=";
+            else if (i == pos) std::cout << ">";
+            else std::cout << " ";
+        }
+        std::cout << "] " << int(progress * 100.0) << " %\r";
+        std::cout.flush();
     }
-    std::cout << "] " << int(progress * 100.0) << " %\r";
-    std::cout.flush();
 }
 
-double calculate_delta_E(const vector<vector<int>>& bits, const vector<vector<double>>& Q, int layer, int bit_index, int new_bit_value, double At, double Bt) {
+double calculate_delta_E(const vector<vector<int>> bits, const vector<vector<double>>& Q, int layer, int bit_index, int new_bit_value, double At, double Bt) {
     double delta_E = 0.0;
     int N = bits[0].size();
     int L = bits.size();
@@ -144,4 +146,38 @@ void generate_n_hot_qubo(std::vector<std::vector<double>>& Q,const std::vector<s
             }
         }
     }
+}
+
+std::vector<std::vector<int>> split_into_chunks(const std::vector<int>& arr, int n) {
+    std::vector<std::vector<int>> result;
+    size_t size = arr.size();
+    
+    for (size_t i = 0; i < size; i += n) {
+        std::vector<int> chunk(arr.begin() + i, arr.begin() + std::min(i + n, size));
+        result.push_back(chunk);
+    }
+
+    return result;
+}
+
+void bit_to_csv(vector<int> result, int colors, string filename) {
+    std::vector<std::vector<int>> data = split_into_chunks(result,colors);
+
+    std::ofstream file(filename + ".csv");
+
+    for (const auto& row : data) {
+        for (size_t i = 0; i < row.size(); ++i) {
+            file << row[i];
+            if (i < row.size() - 1) {
+                file << ",";
+            }
+        }
+        file << "\n"; 
+    }
+
+    file.close();
+    // int ene = evaluate(h,w,data);
+    std::cout << "saved as " << filename << ".csv" << std::endl;
+    // std::cout << ene << std::endl;
+
 }

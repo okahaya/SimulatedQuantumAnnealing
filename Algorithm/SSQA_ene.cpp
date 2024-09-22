@@ -46,8 +46,8 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
             int before_bit1 = bits[layer][bit1];
             int before_bit2 = bits[layer][bit2];
 
-            bits[layer][bit1] = 1 - bits[layer][bit1];
-            bits[layer][bit2] = 1 - bits[layer][bit2];
+            bits[layer][bit1] = before_bit2;
+            bits[layer][bit2] = before_bit1;
 
             double delta_E = 0.0;
             delta_E += calculate_delta_E(bits, Q, layer, bit1, bits[layer][bit1], At, Bt);
