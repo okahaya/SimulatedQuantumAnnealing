@@ -58,19 +58,25 @@ if __name__ == '__main__':
     ax.set_yticklabels(np.arange(2, 4+4))
     plt.gca().invert_yaxis()
     color = ["red","blue","green","yellow","pink"]
-
+    an_step = 20
+    mc_step = 20
     ims = []
-    for cnt in range(int(len(array)/4)):
+    for cnt in range(int(len(array))):
+        mc = cnt % 20
+        an = int(cnt/20)
         for i in range(4):
             for k in range(4):
                 for j in range(4):
                     if array_new[cnt][i*4+k][j] == 1:
-                        ax.text(2+k, 1+i,j, ha='center', va='center', fontsize=20, bbox=dict(facecolor=color[j], edgecolor='white', boxstyle='round', pad=1))
+                        bits = ax.text(2+k, 1+i,j, ha='center', va='center', fontsize=20, bbox=dict(facecolor=color[j], edgecolor='white', boxstyle='round', pad=1))
+        progress = ax.text(0,0,f"anneal step {an}/{an_step}\n monte carlo step {mc}/{mc_step}",fontsize=20,bbox=dict(facecolor='white', edgecolor='white', boxstyle='round', pad=0))
         ims.append(plt.plot())
 
-        fig1=plt.pause(0.001)
         #Gifアニメーションのために画像をためます
         plt.savefig("output/image"+str(cnt  )+".png", dpi=300)
+        bits.remove()
+        progress.remove()
+        
         # dst = cv2.imread('output/image'+str(a)+'.png')
         # out.write(dst) #mp4やaviに出力します
 

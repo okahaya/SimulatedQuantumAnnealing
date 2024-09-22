@@ -5,7 +5,7 @@ img = cv2.imread('output/image0.png')
 height, width, layers = img.shape
 size = (width, height)
 img_array = []
-for i in range(100):
+for i in range(400):
     filename = f"output/image{i}.png"
     img = cv2.imread(filename)
     img_array.append(img)
