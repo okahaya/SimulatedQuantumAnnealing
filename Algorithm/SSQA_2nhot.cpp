@@ -10,10 +10,48 @@
 #include <omp.h>
 #include <chrono>
 #include <fstream>
+#include <unordered_map>
 
 using namespace std;
 
-void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q, double T, double Gamma, const vector<pair<vector<int>, int>>& nhot_memo, double max_dE = 1e6) {
+class VectorSet {
+private:
+    unordered_map<int, vector<int>> element_to_vectors;
+    vector<vector<int>> vectors;
+
+public:
+    VectorSet(const vector<vector<int>>& vectors)  : vectors(vectors)
+    {
+        for (int i = 0; i < vectors.size(); ++i) {
+            for (int element : vectors[i]) {
+                element_to_vectors[element].push_back(i);
+            }
+        }
+    }
+
+    int find_common_element(int idxA, int idxB) {
+        const vector<int>& A = vectors[idxA];
+        const vector<int>& B = vectors[idxB];
+
+
+        for (int element : A) {
+            if (element_to_vectors[element].size() > 1) {
+                for (int vec_idx : element_to_vectors[element]) {
+                    if (vec_idx == idxB) {
+                        return element;
+                    }
+                }
+            }
+        }
+        throw runtime_error("共通要素が見つかりませんでした。");
+    }
+};
+
+int common_element(int nhot1,int nhot2) {
+
+}
+
+void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q, double T, double Gamma, vector<vector<int>>& bit_nhot, VectorSet VectorSet, vector<vector<int>>& ones, double max_dE = 1e6) {
     int N = bits[0].size();
     int L = bits.size();
     double Bt = -1.0 / 2.0 * log(tanh(Gamma / (L * T)));
@@ -25,39 +63,49 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
         thread_local mt19937 rng(random_device{}());
         uniform_real_distribution<double> dist_real(0.0, 1.0);
         uniform_int_distribution<int> dist_layer(0, L - 1);
-        uniform_int_distribution<int> dist_nhot(0, nhot_memo.size() - 1);
+        uniform_int_distribution<int> dist_bit_nhot(0, bit_nhot.size() - 1);
 
         #pragma omp for 
         for (int i = 0; i < L; ++i) {
             int layer = dist_layer(rng);
 
-            const vector<int>& selected_nhot = nhot_memo[dist_nhot(rng)].first;
-            if (selected_nhot.size() < 2) continue; 
-
-            uniform_int_distribution<int> dist_bit(0, selected_nhot.size() - 1);
-            int idx1 = dist_bit(rng);
-            int idx2 = dist_bit(rng);
-            while (idx1 == idx2) {
-                idx2 = dist_bit(rng);
+            uniform_int_distribution<int> dist_ones(0, ones[i].size() - 1); 
+            int bit1 = ones[layer][dist_ones(rng)];
+            int bit2 = ones[layer][dist_ones(rng)];
+            while (bit1 == bit2) {
+                bit2 = ones[layer][dist_ones(rng)];
             }
-            int bit1 = selected_nhot[idx1];
-            int bit2 = selected_nhot[idx2];
+
+            vector<int> nhotidx1 = bit_nhot[bit1];
+            vector<int> nhotidx2 = bit_nhot[bit2];
+
+            int pi1 = VectorSet.find_common_element(nhotidx1[0], nhotidx2[1]);
+            int pi2 = VectorSet.find_common_element(nhotidx1[1], nhotidx2[0]);
+
+            if (bits[layer][pi1] == 1 || bits[layer][pi2] == 1) continue;
+
 
             int before_bit1 = bits[layer][bit1];
             int before_bit2 = bits[layer][bit2];
+            int before_pi1 = bits[layer][pi1];
+            int before_pi2 = bits[layer][pi2];
 
-            bits[layer][bit1] = before_bit2;
-            bits[layer][bit2] = before_bit1;
+            bits[layer][bit1] = before_pi1;
+            bits[layer][bit2] = before_pi2;
 
             double delta_E = 0.0;
             delta_E += calculate_delta_E(bits, Q, layer, bit1, bits[layer][bit1], At, Bt);
             delta_E += calculate_delta_E(bits, Q, layer, bit2, bits[layer][bit2], At, Bt);
+            delta_E += calculate_delta_E(bits, Q, layer, bit1, bits[layer][pi1], At, Bt);
+            delta_E += calculate_delta_E(bits, Q, layer, bit2, bits[layer][pi2], At, Bt);
 
             delta_E = max(-max_dE, min(delta_E, max_dE));
 
             if (dist_real(rng) >= exp(-delta_E / T)) {
                 bits[layer][bit1] = before_bit1;
                 bits[layer][bit2] = before_bit2;
+                bits[layer][pi1] = before_pi1;
+                bits[layer][pi2] = before_pi2;
             }
         }
     }
@@ -65,27 +113,29 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
 
 
 void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& Q, int L, int N, double T, double Gamma, int anneal_steps, int mc_steps, double& duration, const vector<pair<vector<int>, int>>& nhot_memo, bool bit_initialized) {
-    if (bit_initialized == true) {}
-    else {
-        bits.assign(L, vector<int>(N, 0));
-        #pragma omp parallel for
-        for (int i = 0; i < L; ++i) {
-            for (const auto& nhot_pair : nhot_memo) {
-                const vector<int>& selected_bits = nhot_pair.first;
-                int n = nhot_pair.second;
-                vector<bool> is_selected(selected_bits.size(), false);
-                for (int k = 0; k < n; ++k) {
-                    int rand_index;
-                    do {
-                        rand_index = randint(0, selected_bits.size() - 1);
-                    } while (is_selected[rand_index]);
-                    bits[i][selected_bits[rand_index]] = 1;
-                    is_selected[rand_index] = true;
-                }
+    if (bit_initialized == false) {cout << "bits should be initialized" << endl;}
+
+    vector<vector<int>> ones(L);
+    for (int l = 0;l < L ; ++l) {
+        for (int i = 0;i < N; ++i) {
+            if (bits[l][i] == 1) {
+                ones[l].push_back(i);
             }
         }
-    }
+    } 
 
+    vector<vector<int>>nhot1(N);
+    for (int i = 0; i < nhot_memo.size(); ++i) {
+        for (int j = 0; j < nhot_memo[i].first.size(); ++j) {
+            nhot1[nhot_memo[i].first[j]].push_back(i);
+        }
+    }
+    vector<vector<int>>nhot2;
+    for (int i = 0; i < nhot_memo.size(); ++i) {
+        nhot2.push_back(nhot_memo[i].first);
+    }  
+
+    VectorSet VectorSet(nhot2);
 
     const double coolingrate = init_coolingrate(anneal_steps);
     const double gamma = init_gamma(anneal_steps);
@@ -101,7 +151,7 @@ void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& 
     for (int i = 0; i < anneal_steps; ++i) {
         for (int j = 0; j < mc_steps; ++j) {
             
-            monte_carlo_step(bits, Q, T, Gamma, nhot_memo);
+            monte_carlo_step(bits, Q, T, Gamma, nhot1, VectorSet, ones);
         }
         for (int k = 0; k < L; ++ k){
             energies[i][k] = qubo_energy(bits[k], Q);
