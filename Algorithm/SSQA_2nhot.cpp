@@ -33,7 +33,6 @@ public:
         const vector<int>& A = vectors[idxA];
         const vector<int>& B = vectors[idxB];
 
-
         for (int element : A) {
             if (element_to_vectors[element].size() > 1) {
                 for (int vec_idx : element_to_vectors[element]) {
@@ -43,13 +42,10 @@ public:
                 }
             }
         }
-        throw runtime_error("共通要素が見つかりませんでした。");
+        return -1;
     }
 };
 
-int common_element(int nhot1,int nhot2) {
-
-}
 
 void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q, double T, double Gamma, vector<vector<int>>& bit_nhot, VectorSet VectorSet, vector<vector<int>>& ones, double max_dE = 1e6) {
     int N = bits[0].size();
@@ -70,17 +66,18 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
             int layer = dist_layer(rng);
 
             uniform_int_distribution<int> dist_ones(0, ones[i].size() - 1); 
-            int bit1 = ones[layer][dist_ones(rng)];
-            int bit2 = ones[layer][dist_ones(rng)];
+            int idx1 = dist_ones(rng);
+            int idx2 = dist_ones(rng);
+            int bit1 = ones[layer][idx1];
+            int bit2 = ones[layer][idx2];
             while (bit1 == bit2) {
-                bit2 = ones[layer][dist_ones(rng)];
+                idx2 = dist_ones(rng);
+                bit2 = ones[layer][idx2];
             }
 
-            vector<int> nhotidx1 = bit_nhot[bit1];
-            vector<int> nhotidx2 = bit_nhot[bit2];
 
-            int pi1 = VectorSet.find_common_element(nhotidx1[0], nhotidx2[1]);
-            int pi2 = VectorSet.find_common_element(nhotidx1[1], nhotidx2[0]);
+            int pi1 = VectorSet.find_common_element(bit_nhot[bit1][0], bit_nhot[bit2][0]);
+            int pi2 = VectorSet.find_common_element(bit_nhot[bit1][1], bit_nhot[bit2][1]);
 
             if (bits[layer][pi1] == 1 || bits[layer][pi2] == 1) continue;
 
@@ -92,6 +89,11 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
 
             bits[layer][bit1] = before_pi1;
             bits[layer][bit2] = before_pi2;
+            bits[layer][pi1] = before_bit1;
+            bits[layer][pi2] = before_bit2;
+
+            ones[layer][idx1] = pi1;
+            ones[layer][idx2] = pi2;
 
             double delta_E = 0.0;
             delta_E += calculate_delta_E(bits, Q, layer, bit1, bits[layer][bit1], At, Bt);
