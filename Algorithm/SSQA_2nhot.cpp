@@ -44,6 +44,13 @@ public:
         }
         return -1;
     }
+
+    void cout_all(int idxA, int idxB) {
+        const vector<int>& A = vectors[idxA];
+        const vector<int>& B = vectors[idxB];
+        for(int i=0;i<A.size();++i)cout << A[i] << endl;
+        for(int i=0;i<B.size();++i)cout << B[i] << endl;
+    }
 };
 
 
@@ -75,9 +82,12 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
                 bit2 = ones[layer][idx2];
             }
 
-
             int pi1 = VectorSet.find_common_element(bit_nhot[bit1][0], bit_nhot[bit2][0]);
             int pi2 = VectorSet.find_common_element(bit_nhot[bit1][1], bit_nhot[bit2][1]);
+            if (pi1 == -1 || pi2 == -1) {
+                pi1 = VectorSet.find_common_element(bit_nhot[bit1][0], bit_nhot[bit2][1]);
+                pi2 = VectorSet.find_common_element(bit_nhot[bit1][1], bit_nhot[bit2][0]);
+            }
 
             if (bits[layer][pi1] == 1 || bits[layer][pi2] == 1) continue;
 
@@ -108,6 +118,8 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
                 bits[layer][bit2] = before_bit2;
                 bits[layer][pi1] = before_pi1;
                 bits[layer][pi2] = before_pi2;
+                ones[layer][idx1] = bit1;
+                ones[layer][idx2] = bit2;
             }
         }
     }
@@ -126,19 +138,23 @@ void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& 
         }
     } 
 
-    vector<vector<int>>nhot1(N);
+    vector<vector<int>>nhot1(N);//bit_to_nhot
     for (int i = 0; i < nhot_memo.size(); ++i) {
         for (int j = 0; j < nhot_memo[i].first.size(); ++j) {
             nhot1[nhot_memo[i].first[j]].push_back(i);
         }
     }
-    vector<vector<int>>nhot2;
+
+    vector<vector<int>>nhot2(nhot_memo.size());//nhot_to_bit
     for (int i = 0; i < nhot_memo.size(); ++i) {
-        nhot2.push_back(nhot_memo[i].first);
+        nhot2[i] = nhot_memo[i].first;
+        // cout << "bit_nhot[" << i <<"] : ";
+        // for (int j=0;j<nhot_memo[i].first.size();j++)cout << nhot_memo[i].first[j] <<" ";
+        // cout <<endl;
     }  
 
     VectorSet VectorSet(nhot2);
-
+    // cout << VectorSet.find_common_element(0,2) <<endl;
     const double coolingrate = init_coolingrate(anneal_steps);
     const double gamma = init_gamma(anneal_steps);
 

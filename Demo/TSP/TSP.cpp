@@ -2,6 +2,7 @@
 #include <vector>
 #include <fstream>
 #include <omp.h>
+#include <random>
 #include "../../SimulatedQuantumAnnealing.cpp"
 
 void generate_n_hot_qubo(std::vector<std::vector<double>>& Q,vector<int> bits, int n,std::vector<std::pair<std::vector<int>,int>>& nhot_memo, int k) {
@@ -17,7 +18,7 @@ void generate_n_hot_qubo(std::vector<std::vector<double>>& Q,vector<int> bits, i
     nhot_memo.push_back(make_pair(bits,n));
 }
 
-void TSP(vector<vector<double>>& Q,vector<vector<int>>distance, int n,vector<pair<vector<int>,int>>& nhot_memo){
+void TSP(vector<vector<double>>& Q,vector<vector<double>>distance, int n,vector<pair<vector<int>,int>>& nhot_memo){
     double c = 1;
     for(int i=0;i<n;++i){
         for(int k=0;k<n;++k){
@@ -39,22 +40,28 @@ void TSP(vector<vector<double>>& Q,vector<vector<int>>distance, int n,vector<pai
 }
 
 void PreAnnealing(SimulatedQuantumAnnealing& SQA, int n) {
-    vector<pair<vector<int>,int>>nhot_memo; 
-    auto preQ = SQA.init_jij();
+    // vector<pair<vector<int>,int>>nhot_memo; 
+    // auto preQ = SQA.init_jij();
 
-    for(int i=0;i<n;++i){
-        vector<int>idx1(n,-1);
-        vector<int>idx2(n,-1);
+    // for(int i=0;i<n;++i){
+    //     vector<int>idx1(n,-1);
+    //     vector<int>idx2(n,-1);
 
-        for(int j=0;j<n;++j)idx1[j] = i*n+j;
-        for(int j=0;j<n;++j)idx2[j] = j*n+i;
+    //     for(int j=0;j<n;++j)idx1[j] = i*n+j;
+    //     for(int j=0;j<n;++j)idx2[j] = j*n+i;
 
-        generate_n_hot_qubo(preQ,idx1,1,nhot_memo,1);   
-        generate_n_hot_qubo(preQ,idx2,1,nhot_memo,1);
-    }
+    //     generate_n_hot_qubo(preQ,idx1,1,nhot_memo,1);   
+    //     generate_n_hot_qubo(preQ,idx2,1,nhot_memo,1);
+    // }
     
 
-    SQA.init_default_bit(SQA.create_default_bit(preQ,nhot_memo));
+    // SQA.init_default_bit(SQA.create_default_bit(preQ,nhot_memo));
+    vector<int>def(n*n,0);
+    for(int i=0;i<n;++i){
+        def[i*n+i] = 1;
+    }
+    SQA.init_default_bit(def);
+
 }
 
 int main(){
@@ -63,11 +70,11 @@ int main(){
     int anneal_steps = 100;  
 
     int n = 5; // num of sites
-    vector<vector<int>>distance(n,vector<int>(n,0));
-
+    vector<vector<double>>distance(n,vector<double>(n,0));
+    uniform_real_distribution<double> dist_real(0.0, 1.0);
     for (int i=0;i<n;++i) {
         for (int j=0;j<n;++j) {
-            distance[i][j] = 1;
+            distance[i][j] = 10*dist_real(rng);
         }
     }
 
