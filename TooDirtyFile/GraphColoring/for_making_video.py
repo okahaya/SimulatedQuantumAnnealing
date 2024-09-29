@@ -48,11 +48,10 @@ if __name__ == '__main__':
     for cnt in tqdm(range(mc_step * an_step), desc="Processing", unit="iterations"):
         mc = cnt % mc_step
         an = int(cnt / mc_step)
-
         for i in range(h):
             for k in range(w):
                 for j in range(c):
-                    if array_new[cnt][i*4+k][j] == 1:
+                    if array_new[cnt][i*w+k][j] == 1:
                         text_bits[i][k][j].set_text(j)
                         text_bits[i][k][j].set_bbox(dict(facecolor=color[j], edgecolor='white', boxstyle='round', pad=1))
                     else:
