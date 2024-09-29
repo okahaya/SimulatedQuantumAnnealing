@@ -639,12 +639,12 @@ int evaluate(int h, int w,std::vector<std::vector<int>> result){
 
 int main(){
     int num_reads = 1;
-    int mc_steps = 20;
-    int anneal_steps = 20;  
+    int mc_steps = 100;
+    int anneal_steps = 100;  
 
 
-    int h = 4;
-    int w = 4;
+    int h = 20;
+    int w = 20;
     int colors = 4; // num of colors
 
 

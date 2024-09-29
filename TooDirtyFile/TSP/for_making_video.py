@@ -31,8 +31,8 @@ if __name__ == '__main__':
             coords.append((float(row[0]), float(row[1])))
 
 
-    an_step = 20
-    mc_step = 20
+    an_step = 100
+    mc_step = 100
     ims = []
     fig, ax = plt.subplots()
     plt.xlabel("X")
