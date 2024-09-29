@@ -57,8 +57,10 @@ public:
 void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q, double T, double Gamma, vector<vector<int>>& bit_nhot, VectorSet VectorSet, vector<vector<int>>& ones, double max_dE = 1e6) {
     int N = bits[0].size();
     int L = bits.size();
-    double Bt = -1.0 / 2.0 * log(tanh(Gamma / (L * T)));
-    double At = 1/ (L * T);
+    // double Bt = -1.0 / 2.0 * log(tanh(Gamma / (L * T)));
+    // double At = 1/ (L * T);
+    double Bt = T;
+    double At = 1 - T;
     // cout << At <<endl;
     // cout << Bt/At << endl;
     // #pragma omp parallel
@@ -91,7 +93,6 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
 
             if (bits[layer][pi1] == 1 || bits[layer][pi2] == 1) continue;
 
-
             int before_bit1 = bits[layer][bit1];
             int before_bit2 = bits[layer][bit2];
             int before_pi1 = bits[layer][pi1];
@@ -108,16 +109,16 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
             double delta_E = 0.0;
             delta_E += calculate_delta_E(bits, Q, layer, bit1, bits[layer][bit1], At, Bt);
             delta_E += calculate_delta_E(bits, Q, layer, bit2, bits[layer][bit2], At, Bt);
-            delta_E += calculate_delta_E(bits, Q, layer, bit1, bits[layer][pi1], At, Bt);
-            delta_E += calculate_delta_E(bits, Q, layer, bit2, bits[layer][pi2], At, Bt);
-
+            delta_E += calculate_delta_E(bits, Q, layer, pi1, bits[layer][pi1], At, Bt);
+            delta_E += calculate_delta_E(bits, Q, layer, pi2, bits[layer][pi2], At, Bt);
+            // cout << delta_E << endl;
             delta_E = max(-max_dE, min(delta_E, max_dE));
-
             if (dist_real(rng) >= exp(-delta_E / T)) {
                 bits[layer][bit1] = before_bit1;
                 bits[layer][bit2] = before_bit2;
                 bits[layer][pi1] = before_pi1;
                 bits[layer][pi2] = before_pi2;
+
                 ones[layer][idx1] = bit1;
                 ones[layer][idx2] = bit2;
             }
@@ -163,6 +164,7 @@ void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& 
     vector<vector<double>>driver_energies(anneal_steps,vector<double>(L,0));
 
     showProgressBar(0, anneal_steps,"annealing step");
+    // int max_threads = omp_get_max_threads();
     omp_set_num_threads(1);
     #pragma omp parallel
     {
