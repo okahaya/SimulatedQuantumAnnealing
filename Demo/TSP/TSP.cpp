@@ -67,7 +67,7 @@ double calculate_distance(pair<double,double>f, pair<double,double>s){
 }
 
 vector<vector<double>> generate_sites(int n) {
-    uniform_real_distribution<double> dist_real(0.0, 10.0);
+    uniform_real_distribution<double> dist_real(0.0, 1000);
     vector<vector<double>>distance(n,vector<double>(n,0.0));
     vector<pair<double,double>>sites;
     for (int i=0;i<n;++i) {
@@ -92,12 +92,12 @@ vector<vector<double>> generate_sites(int n) {
 
 int main(){
     int num_reads = 1;
-    int mc_steps = 100;
+    int mc_steps = 10;
     int anneal_steps = 100;  
 
     int n = 10; // num of sites
     vector<vector<double>>distance = generate_sites(n);
-    int L = 4; //num of trotter slices
+    int L = 1; //num of trotter slices
     double T = 1.0; // initialzie templature
     SimulatedQuantumAnnealing SQA = SimulatedQuantumAnnealing(n*n,L,mc_steps,anneal_steps,T);
     auto Q = SQA.init_jij();

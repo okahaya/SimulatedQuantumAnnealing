@@ -8,6 +8,7 @@
 #include <limits>
 #include <chrono>
 #include <random>
+#include <unordered_map>
 
 using namespace std;
 
@@ -190,7 +191,7 @@ void bit_to_csv(vector<int> result, int colors, string filename) {
 void all_bit_to_csv(vector<vector<vector<int>>> result, int colors, string filename) {
     std::vector<std::vector<int>> data;
     for(int i=0;i<result.size();++i)data.push_back(result[i][0]);
-    filename = "all_bit";
+    filename = "bit";
     std::ofstream file(filename + ".csv");
 
     for (const auto& row : data) {
@@ -207,21 +208,6 @@ void all_bit_to_csv(vector<vector<vector<int>>> result, int colors, string filen
     // std::cout << ene << std::endl;
 
 }
-
-#include <iostream>
-#include <vector>
-#include <cmath>
-#include <cstdlib>
-#include <algorithm>
-#include <limits>
-#include <random>
-#include <numeric>
-#include <omp.h>
-#include <chrono>
-#include <fstream>
-#include <unordered_map>
-
-using namespace std;
 
 class VectorSet {
 private:
@@ -399,7 +385,7 @@ void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& 
             Gamma *= gamma;
         }
     }
-        all_bit_to_csv(keep_bit,4,"all_bit");
+        all_bit_to_csv(keep_bit,4,"bit");
     }
 
 

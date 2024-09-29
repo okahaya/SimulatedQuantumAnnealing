@@ -54,13 +54,13 @@ public:
 };
 
 
-void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q, double T, double Gamma, vector<vector<int>>& bit_nhot, VectorSet VectorSet, vector<vector<int>>& ones, double max_dE = 1e6) {
+void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q, double T, double Gamma, vector<vector<int>>& bit_nhot, VectorSet VectorSet, vector<vector<int>>& ones, double max_dE = 1e100) {
     int N = bits[0].size();
     int L = bits.size();
-    // double Bt = -1.0 / 2.0 * log(tanh(Gamma / (L * T)));
-    // double At = 1/ (L * T);
-    double Bt = 0;
-    double At = 1 - T;
+    double Bt = -1.0 / 2.0 * log(tanh(Gamma / (L * T)));
+    double At = 1/ (L * T);
+    // double Bt = T;
+    // double At = 1 - T;
     // cout << At <<endl;
     // cout << Bt/At << endl;
     // #pragma omp parallel
@@ -111,7 +111,7 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
             delta_E += calculate_delta_E(bits, Q, layer, bit2, bits[layer][bit2], At, Bt);
             delta_E += calculate_delta_E(bits, Q, layer, pi1, bits[layer][pi1], At, Bt);
             delta_E += calculate_delta_E(bits, Q, layer, pi2, bits[layer][pi2], At, Bt);
-            // cout << delta_E << endl;
+            
             delta_E = max(-max_dE, min(delta_E, max_dE));
             if (dist_real(rng) >= exp(-delta_E / T)) {
                 bits[layer][bit1] = before_bit1;
@@ -122,6 +122,7 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
                 ones[layer][idx1] = bit1;
                 ones[layer][idx2] = bit2;
             }
+
         }
     }
 }
