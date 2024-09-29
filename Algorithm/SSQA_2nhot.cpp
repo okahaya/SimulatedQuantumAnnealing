@@ -59,7 +59,7 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
     int L = bits.size();
     // double Bt = -1.0 / 2.0 * log(tanh(Gamma / (L * T)));
     // double At = 1/ (L * T);
-    double Bt = T;
+    double Bt = 0;
     double At = 1 - T;
     // cout << At <<endl;
     // cout << Bt/At << endl;
