@@ -1,5 +1,5 @@
 #include "SimulatedQuantumAnnealing.h"
-#include "Algorithm/SSQA_2nhot.cpp"
+#include "Algorithm/SSQA_swaprow.cpp"
 #include "Algorithm/SQA.cpp"
 #include <iostream>
 #include <vector>

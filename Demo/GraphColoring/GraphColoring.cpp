@@ -4,7 +4,7 @@
 #include <omp.h>
 #include "../../SimulatedQuantumAnnealing.cpp"
 
-void generate_n_hot_qubo(std::vector<std::vector<double>>& Q,int start,int end, int n,std::vector<std::pair<std::vector<int>,int>>& nhot_memo, int k) {
+void generate_n_hot_qubo(std::vector<std::vector<double>>& Q,int start,int end, int n,std::vector<std::pair<std::vector<int>,int>>& nhot_memo, double k) {
     for (int i = start; i < end; ++i) {
         Q[i][i] = k*(1 - 2 * n);
         for (int j = i + 1; j < end; ++j) {
@@ -79,16 +79,24 @@ void GraphColoring(std::vector<std::vector<double>>& Q, std::pair<int,int>hw,int
 }
 
 void PreAnnealing(SimulatedQuantumAnnealing& SQA, std::pair<int,int>hw, int num_colors) {
-    vector<pair<vector<int>,int>>nhot_memo; 
-    auto preQ = SQA.init_jij();
+    // vector<pair<vector<int>,int>>nhot_memo; 
+    // auto preQ = SQA.init_jij();
     int h = hw.first;
     int w = hw.second;
     int size = h*w;
-    for(int i=0;i<size;++i){
-        generate_n_hot_qubo(preQ,i*num_colors,(1+i)*num_colors,1,nhot_memo,1);   
-    }
+    // for(int i=0;i<size;++i){
+    //     generate_n_hot_qubo(preQ,i*num_colors,(1+i)*num_colors,1,nhot_memo,1);   
+    // }
     
-    SQA.init_default_bit(SQA.create_default_bit(preQ,nhot_memo));
+    // SQA.init_default_bit(SQA.create_default_bit(preQ,nhot_memo));
+    vector<int>bit(size*num_colors,0);
+    thread_local mt19937 rng(random_device{}());
+    uniform_int_distribution<int> dist_col(0,num_colors-1);
+    for(int i=0;i<size;++i){
+        int col = dist_col(rng);
+        bit[i*num_colors+col] = 1;
+    }
+    SQA.init_default_bit(bit);
 }
 
 int evaluate(int h, int w,std::vector<std::vector<int>> result){

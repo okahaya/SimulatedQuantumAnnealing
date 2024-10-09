@@ -13,7 +13,7 @@ if __name__ == "__main__":
         with open(csv_file[que], newline='') as file:
             reader = csv.reader(file)
             for row in reader:
-                array.append([int(x) for x in row])
+                array.append([float(x) for x in row])
 
         plt.figure(figsize=(10, 6))
 

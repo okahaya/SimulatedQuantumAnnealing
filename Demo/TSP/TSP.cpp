@@ -5,7 +5,7 @@
 #include <random>
 #include "../../SimulatedQuantumAnnealing.cpp"
 
-void generate_n_hot_qubo(std::vector<std::vector<double>>& Q,vector<int> bits, int n,std::vector<std::pair<std::vector<int>,int>>& nhot_memo, double k) {
+void generate_n_hot_qubo(std::vector<std::vector<double>>& Q,vector<int>& bits, int n,std::vector<std::pair<std::vector<int>,int>>& nhot_memo, double k) {
     for (int i = 0; i < bits.size(); ++i) {
         Q[i][i] += k*(1 - 2 * n);
         for (int j = i + 1; j < bits.size(); ++j) {
@@ -27,14 +27,17 @@ void TSP(vector<vector<double>>& Q,vector<vector<double>>distance, int n,vector<
         generate_n_hot_qubo(Q,bits1,1,nhot_memo,0);   
         generate_n_hot_qubo(Q,bits2,1,nhot_memo,0);
     }
-        for(int i=0;i<n;++i){
-            for(int k=0;k<n;++k){
-                for(int j=0;j<n-1;++j){
-                    Q[i*n+j][k*n+j+1] += distance[i][k];
+
+    for (int i = 0; i < n; ++i) {
+        for (int j = 0; j < n; ++j) {
+            if (i != j) {
+                for (int k = 0; k < n - 1; ++k) {
+                    Q[i*n + k][j*n + k + 1] += distance[i][j];
                 }
-                Q[i*n+(n-1)][k*n] += distance[i][k];
+                Q[i*n + (n - 1)][j*n] += distance[i][j];
             }
         }
+    }
 }
 
 void PreAnnealing(SimulatedQuantumAnnealing& SQA, int n) {
@@ -67,7 +70,7 @@ double calculate_distance(pair<double,double>f, pair<double,double>s){
 }
 
 vector<vector<double>> generate_sites(int n) {
-    uniform_real_distribution<double> dist_real(0.0, 1000);
+    uniform_real_distribution<double> dist_real(0.0, 10);
     vector<vector<double>>distance(n,vector<double>(n,0.0));
     vector<pair<double,double>>sites;
     for (int i=0;i<n;++i) {
@@ -92,12 +95,12 @@ vector<vector<double>> generate_sites(int n) {
 
 int main(){
     int num_reads = 1;
-    int mc_steps = 10;
+    int mc_steps = 100;
     int anneal_steps = 100;  
 
-    int n = 10; // num of sites
+    int n = 4; // num of sites
     vector<vector<double>>distance = generate_sites(n);
-    int L = 1; //num of trotter slices
+    int L = 4; //num of trotter slices
     double T = 1.0; // initialzie templature
     SimulatedQuantumAnnealing SQA = SimulatedQuantumAnnealing(n*n,L,mc_steps,anneal_steps,T);
     auto Q = SQA.init_jij();
@@ -107,7 +110,7 @@ int main(){
     PreAnnealing(SQA,n);
     TSP(Q,distance,n,nhot_memo);
 
-    vector<pair<vector<int>, double>> result;
+    vector<pair<vector<int>, double>> result;   
     vector<double>duration;
 
     showProgressBar(0, num_reads,"numreads");

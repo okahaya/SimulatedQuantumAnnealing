@@ -47,13 +47,13 @@ double rand_real() {
     
 double init_coolingrate(int anneal_steps){
     if (anneal_steps <= 1) return 1.0;
-    double cool = pow(0.1, 1.0 /(double(anneal_steps)-1));
+    double cool = pow(0.1, 10.0 /(double(anneal_steps)-1));
     return cool;
 }
 
 double init_gamma(int anneal_steps){
     if (anneal_steps <= 1) return 1.0;
-    double gamma = pow(0.1, 1.0 /(double(anneal_steps)-1));
+    double gamma = pow(0.1, 10.0 /(double(anneal_steps)-1));
     return gamma;
 }
 
