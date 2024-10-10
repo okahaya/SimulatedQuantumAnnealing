@@ -12,7 +12,7 @@ double qubo_energy(const vector<int>& bits, const vector<vector<double>>& Q) {
     double energy = 0.0;
     for (int j = 0; j < N; ++j) {
         if (bits[j] == 0) continue;
-        for (int k = j; k < N; ++k) {
+        for (int k = 0; k < N; ++k) {
             if (bits[k] == 0) continue;
             energy += Q[j][k];
         }
@@ -47,13 +47,13 @@ double rand_real() {
     
 double init_coolingrate(int anneal_steps){
     if (anneal_steps <= 1) return 1.0;
-    double cool = pow(0.1, 10.0 /(double(anneal_steps)-1));
+    double cool = pow(0.01, 1.0 /(double(anneal_steps)-1));
     return cool;
 }
 
 double init_gamma(int anneal_steps){
     if (anneal_steps <= 1) return 1.0;
-    double gamma = pow(0.1, 10.0 /(double(anneal_steps)-1));
+    double gamma = pow(0.0001, 1.0 /(double(anneal_steps)-1));
     return gamma;
 }
 
@@ -74,7 +74,7 @@ void showProgressBar(int current, int total, const std::string& label) {
     }
 }
 
-double calculate_delta_E(const vector<vector<int>> bits, const vector<vector<double>>& Q, int layer, int bit_index, int new_bit_value, double At, double Bt) {
+double calculate_delta_E(const vector<vector<int>> &bits, const vector<vector<double>>& Q, int layer, int bit_index, int new_bit_value, double At, double Bt) {
     double delta_E = 0.0;
     int N = bits[0].size();
     int L = bits.size();

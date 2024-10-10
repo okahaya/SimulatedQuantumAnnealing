@@ -25,7 +25,7 @@ void SimulatedQuantumAnnealing::init_default_bit(vector<int> bit) {
 
 vector<int> SimulatedQuantumAnnealing::create_default_bit(vector<vector<double>> Q,vector<pair<vector<int>,int>>nhot_memo) {
     double duration = -1;
-    double Gamma = 5.0;
+    double Gamma = 10.0;
     vector<vector<int>> bits(L, vector<int>(N,0));
 
     saq_execute_annealing(bits, Q, L, N, T, Gamma, anneal_steps, mc_steps, duration, nhot_memo);

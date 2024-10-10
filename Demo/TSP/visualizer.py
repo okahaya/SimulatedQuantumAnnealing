@@ -27,7 +27,7 @@ route.append(route[0])
 total_distance = 0
 for i in range(1, len(route)):
     total_distance += np.linalg.norm(np.array(route[i]) - np.array(route[i - 1]))
-
+    
 x_vals, y_vals = zip(*route)
 
 plt.figure(figsize=(6, 6))

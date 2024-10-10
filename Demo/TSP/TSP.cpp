@@ -98,7 +98,7 @@ int main(){
     int mc_steps = 100;
     int anneal_steps = 100;  
 
-    int n = 4; // num of sites
+    int n = 10; // num of sites
     vector<vector<double>>distance = generate_sites(n);
     int L = 4; //num of trotter slices
     double T = 1.0; // initialzie templature
