@@ -2,6 +2,7 @@
 #include <vector>
 #include <random>
 #include <cmath>
+#include <unordered_set>
 
 using namespace std;
 
@@ -72,6 +73,40 @@ void showProgressBar(int current, int total, const std::string& label) {
         std::cout << "] " << int(progress * 100.0) << " %\r";
         std::cout.flush();
     }
+}
+
+bool Is_contains(const vector<int>& a, int N) {
+    unordered_set<int> set(a.begin(), a.end());
+    return set.find(N) != set.end();
+}
+
+double calculate_delta_E_rowswap(const vector<vector<int>> &bits, const vector<vector<double>>& Q, int layer, const vector<int>& bit_index, double At, double Bt) {
+    double delta_E = 0.0;
+    int N = bits[0].size();
+    int L = bits.size();
+    const vector<int>& bits_layer = bits[layer];
+    vector<int> delta_bits;
+    for (int i = 0; i < bit_index.size(); ++i) {
+        delta_bits.push_back(2*bits_layer[bit_index[i]]- 1);
+    }   
+
+    for (int i = 0; i < bit_index.size(); ++i) {
+        for (int j = 0; j < N; ++j) {
+            if (Q[bit_index[i]][j] != 0.0 && bits_layer[j] != 0) {
+                if (Is_contains(bit_index,j) == false)delta_E += At*static_cast<double>(delta_bits[i])*Q[bit_index[i]][j];
+                else {
+                    for(int k=0;k<bit_index.size();++k)if(j==bit_index[k])delta_E += At*static_cast<double>(delta_bits[i])*static_cast<double>(delta_bits[k])*Q[bit_index[i]][j];
+                }
+            }
+        }
+    }
+
+    int next_layer = (layer + 1) % L;
+    int prev_layer = (layer - 1 + L) % L;
+    for (int i = 0; i < bit_index.size(); ++i) {
+        delta_E += (Bt / L) * delta_bits[i] * (bits[next_layer][bit_index[i]] + bits[prev_layer][bit_index[i]] - 1);
+    }
+    return delta_E;
 }
 
 double calculate_delta_E(const vector<vector<int>> &bits, const vector<vector<double>>& Q, int layer, int bit_index, int new_bit_value, double At, double Bt) {

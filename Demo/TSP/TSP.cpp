@@ -78,6 +78,7 @@ vector<vector<double>> generate_sites(int n) {
         double y = dist_real(rng);
         sites.push_back(make_pair(x,y));
     }
+    
     for (int i=0;i<n;++i) {
         for (int j=0;j<n;++j) {
             distance[i][j] = calculate_distance(sites[i],sites[j]);
@@ -98,7 +99,7 @@ int main(){
     int mc_steps = 10;
     int anneal_steps = 100;  
 
-    int n = 10; // num of sites
+    int n = 3; // num of sites
     vector<vector<double>>distance = generate_sites(n);
     int L = 4; //num of trotter slices
     double T = 1.0; // initialzie templature

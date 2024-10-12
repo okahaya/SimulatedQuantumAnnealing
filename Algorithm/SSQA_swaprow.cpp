@@ -57,10 +57,9 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
         flip_bits(bits[layer], nhot_memo[idx1].first, nhot_memo[idx2].first, fliped_bits);
 
         double delta_E = 0.0;
-        for(int j = 0; j < fliped_bits.size(); ++j) {
-            delta_E += calculate_delta_E(bits, Q, layer, fliped_bits[j], bits[layer][fliped_bits[j]], At, Bt);
-        }
-
+        
+        delta_E += calculate_delta_E_rowswap(bits, Q, layer, fliped_bits, At, Bt);
+        
         delta_E = max(-max_dE, min(delta_E, max_dE));
 
         double acceptance_probability = exp(-delta_E / T);
