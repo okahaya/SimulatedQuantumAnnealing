@@ -32,8 +32,11 @@ void flip_bits(vector<int>& bits, vector<int> idx1, vector<int> idx2, vector<int
 void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q, double T, double Gamma, const vector<pair<vector<int>, int>>& nhot_memo, double max_dE = 1e100) {
     int N = bits[0].size();
     int L = bits.size();
-    double Bt = -1.0 / 2.0 * log(tanh(Gamma / (L * T)));
-    double At = 1 / (L * T);
+    // double At = 1 / (L * T);
+    // double Bt = (-1.0 / 2.0 * log(tanh(Gamma / (L * T))));
+    double Bt = (-1.0 / 2.0 * log(tanh(Gamma / (L * T))))*(L * T);
+    if (Bt < 1e-5)Bt = 0;
+    double At = 1.0;
 
     thread_local mt19937 rng(random_device{}());
     uniform_real_distribution<double> dist_real(0.0, 1.0);
@@ -42,7 +45,8 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
 
     #pragma omp for 
     for (int i = 0; i < L; ++i) {
-        int layer = dist_layer(rng);
+        // int layer = dist_layer(rng);
+        int layer = i;
         int idx1 = dist_nhot(rng);
         int idx2 = dist_nhot(rng);
         while (idx1 % 2 != idx2 % 2) {
@@ -61,13 +65,15 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
 
         double acceptance_probability = exp(-delta_E / T);
     
-        log_file2 << "Layer: " << layer << ", Bt :" << Bt << ", At: " << At <<", Delta_E: " << delta_E << ", Acceptance Probability: " << acceptance_probability << "\n";
-
-
-        if (dist_real(rng) >= exp(-delta_E / T)) {
+        bool accept = true;
+        if (dist_real(rng) >= exp(-delta_E / T) || delta_E == 0) {
             for(int j = 0; j < fliped_bits.size(); ++j) {
                 bits[layer][fliped_bits[j]] = 1 - bits[layer][fliped_bits[j]];
             }
+            accept = false;
+        }
+        if (layer == 0) {
+        log_file2 << "Layer: " << layer << ", Bt :" << Bt << ", At: " << At <<", Delta_E: " << delta_E << ", Acceptance Probability: " << acceptance_probability <<", Is Accepted:" << accept << "\n";
         }
     }
 }
@@ -110,6 +116,7 @@ void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& 
                 showProgressBar(i + 1, anneal_steps, "annealing step");
                 T *= coolingrate;
                 Gamma *= gamma;
+                
             }
         }
     }

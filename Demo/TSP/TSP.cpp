@@ -95,7 +95,7 @@ vector<vector<double>> generate_sites(int n) {
 
 int main(){
     int num_reads = 1;
-    int mc_steps = 100;
+    int mc_steps = 10;
     int anneal_steps = 100;  
 
     int n = 10; // num of sites

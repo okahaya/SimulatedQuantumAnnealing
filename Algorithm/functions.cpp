@@ -47,13 +47,13 @@ double rand_real() {
     
 double init_coolingrate(int anneal_steps){
     if (anneal_steps <= 1) return 1.0;
-    double cool = pow(0.01, 1.0 /(double(anneal_steps)-1));
+    double cool = pow(1e-5, 1.0 /(double(anneal_steps)-1));
     return cool;
 }
 
 double init_gamma(int anneal_steps){
     if (anneal_steps <= 1) return 1.0;
-    double gamma = pow(0.0001, 1.0 /(double(anneal_steps)-1));
+    double gamma = pow(1e-5, 1.0 /(double(anneal_steps)-1));
     return gamma;
 }
 
@@ -82,11 +82,11 @@ double calculate_delta_E(const vector<vector<int>> &bits, const vector<vector<do
     int delta_bit = 2*new_bit_value - 1;
 
     for (int j = 0; j < N; ++j) {
-        if (Q[bit_index][j] != 0.0) {
+        if (Q[bit_index][j] != 0.0 && bits_layer[j] != 0) {
             delta_E += Q[bit_index][j] * bits_layer[j];
         }
     }
-    delta_E *= delta_bit;
+    delta_E *= static_cast<double>(delta_bit);
     delta_E *= At;
 
     int next_layer = (layer + 1) % L;
