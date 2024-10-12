@@ -3,7 +3,7 @@
 #include <fstream>
 #include <omp.h>
 #include <random>
-#include "../../SimulatedQuantumAnnealing.cpp"
+#include "SimulatedQuantumAnnealing.cpp"
 
 void generate_n_hot_qubo(std::vector<std::vector<double>>& Q,vector<int>& bits, int n,std::vector<std::pair<std::vector<int>,int>>& nhot_memo, double k) {
     for (int i = 0; i < bits.size(); ++i) {
