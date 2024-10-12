@@ -52,13 +52,14 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
         while (idx1 % 2 != idx2 % 2) {
             idx2 = dist_nhot(rng);
         }
-        
+        double Epre = qubo_energy(bits[layer],Q);
         vector<int> fliped_bits(1,0);
         flip_bits(bits[layer], nhot_memo[idx1].first, nhot_memo[idx2].first, fliped_bits);
 
-        double delta_E = 0.0;
-        
-        delta_E += calculate_delta_E_rowswap(bits, Q, layer, fliped_bits, At, Bt);
+        double delta_E = 0;
+        delta_E += qubo_energy(bits[layer],Q)-Epre;
+        delta_E += calculate_delta_E_rowswap(bits, Q, layer, fliped_bits, 0, Bt);
+        // delta_E += calculate_delta_E_rowswap(bits, Q, layer, fliped_bits, At, Bt);
         
         delta_E = max(-max_dE, min(delta_E, max_dE));
 

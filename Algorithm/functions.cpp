@@ -3,10 +3,13 @@
 #include <random>
 #include <cmath>
 #include <unordered_set>
+#include <fstream>
+#include <sstream>
+#include <string>
 
 using namespace std;
 
-thread_local std::mt19937 rng(std::random_device{}());
+thread_local std::mt19937 rng(::random_device{}());
 
 double qubo_energy(const vector<int>& bits, const vector<vector<double>>& Q) {
     int N = bits.size();
@@ -54,7 +57,7 @@ double init_coolingrate(int anneal_steps){
 
 double init_gamma(int anneal_steps){
     if (anneal_steps <= 1) return 1.0;
-    double gamma = pow(1e-5, 1.0 /(double(anneal_steps)-1));
+    double gamma = pow(1e-10, 1.0 /(double(anneal_steps)-1));
     return gamma;
 }
 

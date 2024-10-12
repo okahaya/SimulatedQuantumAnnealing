@@ -81,7 +81,8 @@ vector<vector<double>> generate_sites(int n) {
     
     for (int i=0;i<n;++i) {
         for (int j=0;j<n;++j) {
-            distance[i][j] = calculate_distance(sites[i],sites[j]);
+            if (i == j)distance[i][j] = 0.0;
+            else distance[i][j] = calculate_distance(sites[i],sites[j]);
         }
     }
     ofstream file("sites.csv");
@@ -94,13 +95,68 @@ vector<vector<double>> generate_sites(int n) {
     return distance;
 }
 
+struct City {
+    // int id;
+    double x;
+    double y;
+};
+
+std::vector<City> readCSV(const std::string& filename) {
+    std::vector<City> cities;
+    std::ifstream file(filename);
+    std::string line;
+    
+    if (!file.is_open()) {
+        std::cerr << "Error: Could not open file " << filename << std::endl;
+        return cities;
+    }
+
+    while (std::getline(file, line)) {  
+        std::istringstream ss(line);
+        City city;
+        int temp;
+        ss >> temp >> city.x >> city.y;
+
+        cities.push_back(city);  
+    }
+    
+    file.close(); 
+    return cities;
+}
+
+vector<vector<double>> generate_sites_from_file(string filename){
+    vector<City>cities = readCSV(filename);
+    int n = cities.size();
+    vector<vector<double>>distance(n,vector<double>(n,0.0));
+    vector<pair<double,double>>sites;
+    for (int i=0;i<n;++i) {
+        sites.push_back(make_pair(cities[i].x,cities[i].y));
+    }
+    
+    for (int i=0;i<n;++i) {
+        for (int j=0;j<n;++j) {
+            if (i == j)distance[i][j] = 0.0;
+            else distance[i][j] = calculate_distance(sites[i],sites[j]);
+        }
+    }
+    ofstream file("sites.csv");
+    file << "X,Y\n";
+    for (const auto& site : sites) {
+        file << site.first << "," << site.second << "\n";
+    }
+    file.close();
+
+    return distance;
+} 
+
 int main(){
     int num_reads = 1;
-    int mc_steps = 10;
+    int mc_steps = 100;
     int anneal_steps = 100;  
 
-    int n = 3; // num of sites
-    vector<vector<double>>distance = generate_sites(n);
+    int n = 51; // num of sites
+    vector<vector<double>>distance = generate_sites_from_file("eli51tsp.csv");
+
     int L = 4; //num of trotter slices
     double T = 1.0; // initialzie templature
     SimulatedQuantumAnnealing SQA = SimulatedQuantumAnnealing(n*n,L,mc_steps,anneal_steps,T);
