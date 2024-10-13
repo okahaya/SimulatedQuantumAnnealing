@@ -3,8 +3,7 @@ import numpy as np
 import csv
 from tqdm import tqdm
 import time
-
-
+    
 def broken(i,k,result,h,w):
     i = i*w + k
     colors = len(result[0])
@@ -66,17 +65,10 @@ if __name__ == '__main__':
     an_step = 100
     mc_step = 100
 
-    text_bits1 = [[[
-        ax[0].text(1+k, 1+i, "", ha='center', va='center', fontsize=5,
-                bbox=dict(facecolor='white', edgecolor='white', boxstyle='round', pad=0))
-        for j in range(c)] for k in range(w)] for i in range(h)]
-    text_bits2 = [[[
-        ax[1].text(1+k, 1+i, "", ha='center', va='center', fontsize=5,
-                bbox=dict(facecolor='white', edgecolor='white', boxstyle='round', pad=0))
-        for j in range(c)] for k in range(w)] for i in range(h)]
+    text_bits1 = [[[None for _ in range(c)] for _ in range(w)] for _ in range(h)]
+    text_bits2 = [[[None for _ in range(c)] for _ in range(w)] for _ in range(h)]
     
     progress = ax[0].text(0, 0, "", fontsize=5, bbox=dict(facecolor='white', edgecolor='white', boxstyle='round', pad=0))
-
 
 
     for cnt in tqdm(range(mc_step * an_step), desc="Processing", unit="iterations"):
@@ -86,18 +78,31 @@ if __name__ == '__main__':
             for k in range(w):
                 for j in range(c):
                     if (broken(i,k,array_new[cnt],h,w) == True):
-                        text_bits2[i][k][j].set_text("  ")
-                        text_bits2[i][k][j].set_bbox(dict(facecolor="green", edgecolor='white', boxstyle='round', pad=0.5))    
-                        
-                    if array_new[cnt][i*w+k][j] == 1:
-                        text_bits1[i][k][j].set_text(j)
-                        text_bits1[i][k][j].set_bbox(dict(facecolor=color[j], edgecolor='white', boxstyle='round', pad=0.5))
+                        if text_bits2[i][k][j] is None: 
+                            text_bits2[i][k][j] = ax[1].text(1+k, 1+i, "  ", ha='center', va='center', fontsize=5,bbox=dict(facecolor="green", edgecolor='white', boxstyle='round', pad=0.5))
+                        else:
+                            text_bits2[i][k][j].set_text("  ")
+                            text_bits2[i][k][j].set_bbox(dict(facecolor="green", edgecolor='white', boxstyle='round', pad=0.5))    
                     else:
-                        text_bits1[i][k][j].set_text("") 
+                        if text_bits2[i][k][j] is not None:
+                            text_bits2[i][k][j].set_text("")
+                            text_bits2[i][k][j].set_bbox(dict(facecolor="white", edgecolor='white', boxstyle='round', pad=0))
+
+                    if array_new[cnt][i*w+k][j] == 1:
+                        if text_bits1[i][k][j] is None:
+                            text_bits1[i][k][j] = ax[0].text(1+k, 1+i, j, ha='center', va='center', fontsize=5,bbox=dict(facecolor=color[j], edgecolor='white', boxstyle='round', pad=0.5))
+                        else:
+                            text_bits1[i][k][j].set_text(j)
+                            text_bits1[i][k][j].set_bbox(dict(facecolor=color[j], edgecolor='white', boxstyle='round', pad=0.5))
+                    else:
+                        if text_bits1[i][k][j] is not None:
+                            text_bits1[i][k][j].set_text("")
+                            text_bits1[i][k][j].set_bbox(dict(facecolor="white", edgecolor='white', boxstyle='round', pad=0))
 
 
         progress.set_text(f"anneal step {an}/{an_step}\n monte carlo step {mc}/{mc_step}")
 
         plt.savefig("output/image" + str(cnt) + ".png", dpi=300)
+
 
     plt.close()
