@@ -10,18 +10,6 @@ def split_every_Nelement(li,N):
     return splited
 
 if __name__ == '__main__':
-    
-    csv_file = 'bit.csv'
-    array = []
-
-    with open(csv_file, newline='') as file:
-        reader = csv.reader(file)
-        for row in reader:
-            array.append([int(x) for x in row])
-    array_new = []
-    n = int((len(array[0]))**(1/2))
-    for i in range(len(array)):
-        array_new.append(split_every_Nelement(array[i],n))
 
     coords = []
     with open('sites.csv', 'r') as file:
@@ -30,39 +18,64 @@ if __name__ == '__main__':
         for row in reader:
             coords.append((float(row[0]), float(row[1])))
 
+    visit_order = []
+    with open('allroute.csv','r') as file:
+        reader = csv.reader(file)
+        for row in reader:
+            visit_order.append([int(val) for val in row])
+    route = [[] for i in range(len(coords))]
+    for j in range(len(coords)):
+        for i in range(len(coords)):
+            route[j].append(coords[visit_order[j][i]])
+
+    for i in range(len(coords)):
+        route[i].append(route[i][0])
+
+    energies = []
+    with open('energies.csv', newline='') as file:
+            reader = csv.reader(file)
+            for row in reader:
+                energies = [float(x) for x in row]
+                break
+                
 
     an_step = 100
     mc_step = 100
-    ims = []
-    fig, ax = plt.subplots()
-    plt.xlabel("X")
-    plt.ylabel("Y")
-    plt.title("")
+    fig, ax = plt.subplots(1,2,figsize=(10,5))
     for idx, (x, y) in enumerate(coords):
-        plt.text(x, y, f' {idx}', fontsize=12, color='black')
+        ax[0].text(x, y, f' {idx}', fontsize=12, color='black')
     
+    ax[1].set_title('Anneal Steps VS Energies of Objective')
+    ax[1].set_xlabel('monte carlo step')
+    ax[1].set_ylabel('qubo energy')
+    line = ax[1].plot([], [], color='red')[0] 
+
+    ax[1].autoscale(enable=True, axis='both')
+    ax[1].set_autoscaley_on(True) 
+
+    x_data = []
+    y_data = []
+
     for cnt in tqdm(range(mc_step*an_step),desc="Processing", unit="iterations"):
         mc = cnt % mc_step
         an = int(cnt/mc_step)
-        route = []
-        for j in range(len(coords)):
-            for i in range(len(coords)):
-                if array_new[cnt][i][j] == 1:
-                    route.append(coords[i])
-        route.append(route[0])        
+        
         total_distance = 0
 
-        x_vals, y_vals = zip(*route)
+        x_vals, y_vals = zip(*route[cnt])
         
-        edge, = plt.plot(x_vals, y_vals, marker='o', linestyle='-', color='b')
-        e1 = plt.scatter(*zip(*coords), color='r')
-
-
-        plt.grid(True)
+        edge, = ax[0].plot(x_vals, y_vals, marker='o', linestyle='-', color='b')
+        e1 = ax[0].scatter(*zip(*coords), color='r')
+        progress = ax[0].text(0,0,f"anneal step {an}/{an_step}\n monte carlo step {mc}/{mc_step}",fontsize=10,bbox=dict(facecolor='white', edgecolor='white', boxstyle='round', pad=0))
+        
+        x_data.append(cnt)
+        y_data.append(energies[cnt])
+        line.set_data(x_data,y_data)
+        ax[1].relim()  
+        ax[1].autoscale_view() 
+        # ax[1].plot(cnt,energies[cnt],color='red')
         plt.plot()
 
-        progress = ax.text(0,0,f"anneal step {an}/{an_step}\n monte carlo step {mc}/{mc_step}",fontsize=20,bbox=dict(facecolor='white', edgecolor='white', boxstyle='round', pad=0))
-        ims.append(plt.plot())
         
         plt.savefig("output/image"+str(cnt  )+".png", dpi=300)
 
