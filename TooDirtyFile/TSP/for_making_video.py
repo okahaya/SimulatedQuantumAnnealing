@@ -23,8 +23,8 @@ if __name__ == '__main__':
         reader = csv.reader(file)
         for row in reader:
             visit_order.append([int(val) for val in row])
-    route = [[] for i in range(len(coords))]
-    for j in range(len(coords)):
+    route = [[] for i in range(10000)]
+    for j in range(10000):
         for i in range(len(coords)):
             route[j].append(coords[visit_order[j][i]])
 
