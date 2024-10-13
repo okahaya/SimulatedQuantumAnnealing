@@ -60,17 +60,14 @@ def only_broken_visualize_colored_graph(result, size_w,size_h, colors):
     plt.show()
 
 if __name__ == '__main__':
-    # CSVファイルのパス
+
     csv_file = 'graphcolored.csv'
 
-    # 空の二次元配列を作成
     array = []
 
-    # CSVファイルを読み込む
     with open(csv_file, newline='') as file:
         reader = csv.reader(file)
         for row in reader:
-            # 行ごとにリストに変換して二次元配列に追加
             array.append([int(x) for x in row])
 
     h = int(len(array)**(1/2))
