@@ -39,8 +39,8 @@ if __name__ == '__main__':
                 break
                 
 
-    an_step = 100
-    mc_step = 100
+    an_step = 10000
+    # mc_step = 100
     fig, ax = plt.subplots(1,2,figsize=(10,5))
     for idx, (x, y) in enumerate(coords):
         ax[0].text(x, y, f' {idx}', fontsize=12, color='black')
@@ -56,9 +56,9 @@ if __name__ == '__main__':
     x_data = []
     y_data = []
 
-    for cnt in tqdm(range(mc_step*an_step),desc="Processing", unit="iterations"):
-        mc = cnt % mc_step
-        an = int(cnt/mc_step)
+    for cnt in tqdm(range(an_step),desc="Processing", unit="iterations"):
+        # mc = cnt % mc_step
+        an = cnt
         
         total_distance = 0
 
@@ -66,8 +66,8 @@ if __name__ == '__main__':
         
         edge, = ax[0].plot(x_vals, y_vals, marker='o', linestyle='-', color='b')
         e1 = ax[0].scatter(*zip(*coords), color='r')
-        progress = ax[0].text(0,0,f"anneal step {an}/{an_step}\n monte carlo step {mc}/{mc_step}",fontsize=10,bbox=dict(facecolor='white', edgecolor='white', boxstyle='round', pad=0))
-        
+        progress = ax[0].text(0,0,f"anneal step {an}/{an_step}",fontsize=10,bbox=dict(facecolor='white', edgecolor='white', boxstyle='round', pad=0))
+        # \n monte carlo step {mc}/{mc_step}
         x_data.append(cnt)
         y_data.append(energies[cnt])
         line.set_data(x_data,y_data)
