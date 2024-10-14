@@ -66,7 +66,8 @@ pair<vector<int>, double> SimulatedQuantumAnnealing::swaq(vector<vector<double>>
         for (int i = 0; i < L; ++i) bits[i] = default_bit;
     } 
 
-    execute_annealing(bits,Q,L,N,T,Gamma,anneal_steps,mc_steps,duration,nhot_memo,bit_initialized);
+    // execute_annealing(bits,Q,L,N,T,Gamma,anneal_steps,mc_steps,duration,nhot_memo,bit_initialized);
+    saq_execute_annealing(bits, Q, L, N, T, Gamma, anneal_steps, mc_steps, duration, nhot_memo);
 
     // std::cout << "Execution time: " << duration << " ms" << endl;
 

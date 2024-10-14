@@ -74,7 +74,7 @@ void GraphColoring(std::vector<std::vector<double>>& Q, std::pair<int,int>hw,int
 
     }
     for(int i=0;i<size;++i){
-        generate_n_hot_qubo(Q,i*num_colors,(1+i)*num_colors,1,nhot_memo,0);   
+        generate_n_hot_qubo(Q,i*num_colors,(1+i)*num_colors,1,nhot_memo,5);   
     }
 }
 
@@ -117,12 +117,12 @@ int evaluate(int h, int w,std::vector<std::vector<int>> result){
 
 int main(){
     int num_reads = 1;
-    int mc_steps = 100;
+    int mc_steps = 1000;
     int anneal_steps = 100;  
 
 
-    int h = 20;
-    int w = 20;
+    int h = 40;
+    int w = 40;
     int colors = 4; // num of colors
 
 

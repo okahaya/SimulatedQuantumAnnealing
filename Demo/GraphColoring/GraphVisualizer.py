@@ -24,21 +24,27 @@ def visualize_colored_graph(result, size_w,size_h, colors):
 def broken(i,k,result,h,w):
     i = i*w + k
     colors = len(result[0])
+    cnt = 0
     for col in range(colors):
         if result[i][col] == 1:
             if i>=w:
                 if result[i-w][col] == 1:
-                    return True
+                    return "D"
             if i%w != 0:
                 if result[i-1][col] == 1:
-                    return True
+                    return "D"
             if i%w != w-1:
                 if result[i+1][col] == 1:
-                    return True
+                    return "D"
             if i<h*w-w:
                 if result[i+w][col] == 1:
-                    return True
-    return False
+                    return "D"
+        else:
+            cnt += 1
+    if cnt == colors:
+        return "N"
+    return None
+
 
 def only_broken_visualize_colored_graph(result, size_w,size_h, colors):
     fig, ax = plt.subplots()
@@ -48,12 +54,17 @@ def only_broken_visualize_colored_graph(result, size_w,size_h, colors):
     ax.set_yticks(np.arange(size_h+2))
     ax.set_xticklabels(np.arange(2, size_w+4))
     ax.set_yticklabels(np.arange(2, size_h+4))
+    ax.text(0, size_h+4,"  ", ha='center', va='center', fontsize=5, bbox=dict(facecolor="green", edgecolor='white', boxstyle='round', pad=0.5))
+    ax.text(5.3, size_h+4,": broken duplicate constraint", ha='center', va='center', fontsize=5)
+    ax.text(0, size_h+5.5,"  ", ha='center', va='center', fontsize=5, bbox=dict(facecolor="red", edgecolor='white', boxstyle='round', pad=0.5))
+    ax.text(5, size_h+5.5,": broken one-hot constraint", ha='center', va='center', fontsize=5)
     for i in range(size_h):
         for k in range(size_w):
-            for j in range(colors):
-                if result[i*size_w+k][j] == 1:
-                    if (broken(i,k,result,size_h,size_w) == True):
-                        ax.text(1+k, 1+i,j, ha='center', va='center', fontsize=5, bbox=dict(facecolor="green", edgecolor='white', boxstyle='round', pad=0.5))
+            Is_broken = broken(i,k,result,size_h,size_w)
+            if (Is_broken == "D"):
+                ax.text(1+k, 1+i,"  ", ha='center', va='center', fontsize=5, bbox=dict(facecolor="green", edgecolor='white', boxstyle='round', pad=0.5))
+            if (Is_broken == "N"):
+                ax.text(1+k, 1+i,"  ", ha='center', va='center', fontsize=5, bbox=dict(facecolor="red", edgecolor='white', boxstyle='round', pad=0.5))
 
  
     plt.gca().invert_yaxis()
