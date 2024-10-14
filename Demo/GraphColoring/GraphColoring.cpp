@@ -74,7 +74,7 @@ void GraphColoring(std::vector<std::vector<double>>& Q, std::pair<int,int>hw,int
 
     }
     for(int i=0;i<size;++i){
-        generate_n_hot_qubo(Q,i*num_colors,(1+i)*num_colors,1,nhot_memo,5);   
+        generate_n_hot_qubo(Q,i*num_colors,(1+i)*num_colors,1,nhot_memo,0);   
     }
 }
 
