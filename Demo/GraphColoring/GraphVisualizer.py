@@ -39,9 +39,8 @@ def broken(i,k,result,h,w):
             if i<h*w-w:
                 if result[i+w][col] == 1:
                     return "D"
-        else:
             cnt += 1
-    if cnt == colors:
+    if cnt != 1:
         return "N"
     return None
 

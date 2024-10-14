@@ -295,9 +295,7 @@ void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& 
     {
     for (int i = 0; i < anneal_steps; ++i) {
         for (int j = 0; j < mc_steps; ++j) {
-            
             monte_carlo_step(bits, Q, T, Gamma, nhot_memo);
-            keep_bit.push_back(bits);
         }
         for (int k = 0; k < L; ++ k){
             energies[i][k] = qubo_energy(bits[k], Q);
@@ -312,7 +310,7 @@ void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& 
             showProgressBar(i+1, anneal_steps,"annealing step");
             T *= coolingrate;
             Gamma *= gamma;
-        
+            keep_bit.push_back(bits);
         }
     }
     all_bit_to_csv(keep_bit,4,"all_bit");
@@ -418,7 +416,7 @@ void saq_execute_annealing(vector<vector<int>>& bits,vector<vector<double>> Q,in
     }
     
     energies = transpose(energies);
-    ofstream file1("preannealing_energies.csv");
+    ofstream file1("energies.csv");
 
     for (const auto& row : energies) {
         for (size_t i = 0; i < row.size(); ++i) {
@@ -517,6 +515,7 @@ pair<vector<int>, double> SimulatedQuantumAnnealing::swaq(vector<vector<double>>
     } 
 
     execute_annealing(bits,Q,L,N,T,Gamma,anneal_steps,mc_steps,duration,nhot_memo,bit_initialized);
+    // saq_execute_annealing(bits, Q, L, N, T, Gamma, anneal_steps, mc_steps, duration, nhot_memo);
 
     // std::cout << "Execution time: " << duration << " ms" << endl;
 
@@ -639,8 +638,8 @@ int evaluate(int h, int w,std::vector<std::vector<int>> result){
 
 int main(){
     int num_reads = 1;
-    int mc_steps = 100;
-    int anneal_steps = 100;  
+    int mc_steps = 1000;
+    int anneal_steps = 1000;  
 
 
     int h = 20;
@@ -657,7 +656,7 @@ int main(){
 
     vector<pair<vector<int>,int>>nhot_memo;    
 
-    PreAnnealing(SQA,hw,colors);
+    // PreAnnealing(SQA,hw,colors);
     GraphColoring(Q,hw,colors,nhot_memo);
 
     vector<pair<vector<int>, double>> result;
