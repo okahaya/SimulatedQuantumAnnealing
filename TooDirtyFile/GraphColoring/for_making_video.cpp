@@ -395,7 +395,7 @@ void saq_execute_annealing(vector<vector<int>>& bits,vector<vector<double>> Q,in
     const double coolingrate = init_coolingrate(anneal_steps);
     const double gamma = init_gamma(mc_steps);
     vector<vector<double>>energies(anneal_steps,vector<double>(L,0));
-
+    vector<vector<vector<int>>>keep_bit;
     showProgressBar(0, anneal_steps,"annealing step");
     omp_set_num_threads(1);
     #pragma omp parallel
@@ -412,9 +412,11 @@ void saq_execute_annealing(vector<vector<int>>& bits,vector<vector<double>> Q,in
             showProgressBar(i+1, anneal_steps,"annealing step");
             T *= coolingrate;
             Gamma *= gamma;
+            keep_bit.push_back(bits);
         }
     }
     
+    all_bit_to_csv(keep_bit,4,"all_bit");
     energies = transpose(energies);
     ofstream file1("energies.csv");
 

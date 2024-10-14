@@ -63,8 +63,13 @@ if __name__ == '__main__':
     ax[1].set_xticks(np.arange(w+2))
     ax[1].set_yticks(np.arange(h+2))
     ax[1].set_xticklabels(np.arange(2, w+4))
-    ax[1].set_yticklabels(np.arange(2, h+4))
+    ax[1].set_yticklabels(np.arange(2, h+4))    
+    ax[1].text(0, -h*0.08,"  ", ha='center', va='center', fontsize=5, bbox=dict(facecolor="green", edgecolor='white', boxstyle='round', pad=0.5))
+    ax[1].text(w*0.20, -h*0.08,"broken duplicate constraint", ha='center', va='center', fontsize=5)
+    ax[1].text(0, -h*0.12,"  ", ha='center', va='center', fontsize=5, bbox=dict(facecolor="red", edgecolor='white', boxstyle='round', pad=0.5))
+    ax[1].text(w*0.20, -h*0.12,"broken one-hot constraint", ha='center', va='center', fontsize=5)
     plt.gca().invert_yaxis()
+
     color = ["red", "blue", "green", "yellow"]
     an_step = 1000
 
