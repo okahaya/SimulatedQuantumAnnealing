@@ -194,8 +194,6 @@ void bit_to_csv(vector<int> result, int colors, string filename) {
 }
 
 
-std::ofstream mc_log_file("montecarlo_log.csv");
-
 void select_bits(vector<int>& bits, vector<int> idx1, vector<int> idx2, vector<int>& flip_bits) {
     flip_bits.clear();
     for (int i=0; i<idx1.size(); ++i) {
@@ -291,15 +289,11 @@ void monte_carlo_step(vector<vector<int>>& bits, const vector<vector<double>>& Q
     
     delta_E = max(-max_dE, min(delta_E, max_dE));
 
-    double acceptance_probability = exp(-delta_E / T);
     
     bool accept = false;
     if (dist_real(rng) < exp(-delta_E / T) && delta_E != 0) {
         flip_bits(bits[layer],fliped_bits);
         accept = true;
-    }
-    if (layer == 0) {
-    mc_log_file << "Layer: " << layer << ", Bt :" << Bt << ", At: " << At <<", Delta_E: " << delta_E << ", Acceptance Probability: " << acceptance_probability <<", Is Accepted:" << accept << "\n";
     }
 }
 // データをCSV形式で保存する関数
@@ -346,7 +340,6 @@ void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& 
     vector<double> energies;
 
     
-    mc_log_file << "Acceptance Probability\n";
     showProgressBar(0, anneal_steps, "annealing step");
     omp_set_num_threads(4);
     resetCSV(filename);
