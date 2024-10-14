@@ -6,16 +6,16 @@ def visualize_colored_graph(result, size_w,size_h, colors):
     fig, ax = plt.subplots()
     ax.set_title(f"Colored Graph")
     ax.axis('off')
-    ax.set_xticks(np.arange(size_w+4))
+    ax.set_xticks(np.arange(size_w+2))
     ax.set_yticks(np.arange(size_h+2))
-    ax.set_xticklabels(np.arange(1, size_w+5))
+    ax.set_xticklabels(np.arange(2, size_w+4))
     ax.set_yticklabels(np.arange(2, size_h+4))
     color = ["red","blue","green","yellow","pink"]
     for i in range(size_h):
         for k in range(size_w):
             for j in range(colors):
                 if result[i*size_w+k][j] == 1:
-                    ax.text(2+k, 1+i,j, ha='center', va='center', fontsize=20, bbox=dict(facecolor=color[j], edgecolor='white', boxstyle='round', pad=0))
+                    ax.text(1+k, 1+i,j, ha='center', va='center', fontsize=5, bbox=dict(facecolor=color[j], edgecolor='white', boxstyle='round', pad=0.5))
 
  
     plt.gca().invert_yaxis()
@@ -44,16 +44,16 @@ def only_broken_visualize_colored_graph(result, size_w,size_h, colors):
     fig, ax = plt.subplots()
     ax.set_title(f"Only Broken")
     ax.axis('off')
-    ax.set_xticks(np.arange(size_w+4))
+    ax.set_xticks(np.arange(size_w+2))
     ax.set_yticks(np.arange(size_h+2))
-    ax.set_xticklabels(np.arange(1, size_w+5))
+    ax.set_xticklabels(np.arange(2, size_w+4))
     ax.set_yticklabels(np.arange(2, size_h+4))
     for i in range(size_h):
         for k in range(size_w):
             for j in range(colors):
                 if result[i*size_w+k][j] == 1:
                     if (broken(i,k,result,size_h,size_w) == True):
-                        ax.text(2+k, 1+i,j, ha='center', va='center', fontsize=20, bbox=dict(facecolor="green", edgecolor='white', boxstyle='round', pad=0))
+                        ax.text(1+k, 1+i,j, ha='center', va='center', fontsize=5, bbox=dict(facecolor="green", edgecolor='white', boxstyle='round', pad=0.5))
 
  
     plt.gca().invert_yaxis()
