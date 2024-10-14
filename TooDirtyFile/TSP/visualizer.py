@@ -28,7 +28,7 @@ with open('allroute.csv','r') as file:
         visit_order.append([int(val) for val in row])
 route = []
 for i in range(len(coords)):
-    route.append(coords[visit_order[99][i]])
+    route.append(coords[visit_order[9999][i]])
 
 route.append(route[0])
 

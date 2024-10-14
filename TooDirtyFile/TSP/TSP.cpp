@@ -355,7 +355,14 @@ void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& 
         for (int i = 0; i < anneal_steps; i++) {
             for (int j = 0; j < mc_steps; j++) {
                 monte_carlo_step(bits,Q,layer,T,Gamma,nhot_memo);
-                if(layer == 0){
+            }
+            
+
+            if (layer == 0) {
+                showProgressBar(i + 1, anneal_steps, "annealing step");
+                T *= coolingrate;
+                Gamma *= gamma;
+                
                 energies.push_back(qubo_energy(bits[layer], Q));
                 vector<int>route(51,-1);
                 for(int site=0;site<51;++site){
@@ -364,14 +371,6 @@ void execute_annealing(vector<vector<int>>& bits, const vector<vector<double>>& 
                     }
                 }
                 saveToCSV(filename, route);
-                }
-            }
-            
-
-            if (layer == 0) {
-                showProgressBar(i + 1, anneal_steps, "annealing step");
-                T *= coolingrate;
-                Gamma *= gamma;
             }
         }
     }
@@ -719,8 +718,8 @@ vector<vector<double>> generate_sites_from_file(string filename){
 
 int main(){
     int num_reads = 1;
-    int mc_steps = 100;
-    int anneal_steps = 100;  
+    int mc_steps = 1000;
+    int anneal_steps = 10000;  
 
     int n = 51; // num of sites
     vector<vector<double>>distance = generate_sites_from_file("eli51tsp.csv");
