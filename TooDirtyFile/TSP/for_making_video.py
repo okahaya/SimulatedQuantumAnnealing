@@ -44,9 +44,9 @@ if __name__ == '__main__':
     fig, ax = plt.subplots(1,2,figsize=(10,5))
     for idx, (x, y) in enumerate(coords):
         ax[0].text(x, y, f' {idx}', fontsize=12, color='black')
-    
+    ax[0].set_title('TSP (eli51.tsp)')
     ax[1].set_title('Anneal Steps VS Energies of Objective')
-    ax[1].set_xlabel('monte carlo step')
+    ax[1].set_xlabel('annealing step')
     ax[1].set_ylabel('qubo energy')
     line = ax[1].plot([], [], color='red')[0] 
 
